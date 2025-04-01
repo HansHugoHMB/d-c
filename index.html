@@ -1,1 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="icon" href="https://raw.githubusercontent.com/HansHugoHMB/Images/main/FAV2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMB-TECH DÉCRYPTER CRYPTER</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Boldonce:wght@400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0D1C40;
+            color: #FFFFFF;
+            font-family: 'Boldonce', sans-serif; /* Apply Boldonce font */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            min-height: 100vh; /* Ensure full viewport height */
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
+        .container {
+            background-color: #0D1C49;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            width: 90%; /* 90% of the viewport width */
+            max-width: 600px; /* Optional: Limit maximum width */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em; /* Adjusted font size for the new header */
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            width: 90%; /* 90% of the container width */
+            align-self: center; /* Center within the container */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        select {
+            width: calc(100% - 12px); /* Adjust for padding */
+            padding: 8px;
+            margin: 0;
+            background-color: #0D1C40;
+            border: 1px solid white; /* White border */
+            border-radius: 5px; /* Rounded borders */
+            color: #FFFFFF;
+            box-sizing: border-box;
+            font-size: 1em;
+            /* Style for the dropdown options */
+            -webkit-appearance: none; /* Remove default arrow in some browsers */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: 100%;
+            background-position-y: 5px;
+            padding-right: 20px;
+        }
+
+        select option {
+            background-color: #0D1C40;
+            color: white;
+            padding: 8px;
+            margin-bottom: 5px; /* Spacing between options */
+        }
+
+        input, textarea {
+            width: calc(100% - 12px); /* Adjust for padding */
+            padding: 8px;
+            margin: 0;
+            background-color: #0D1C40;
+            border: 1px solid #4CAF50;
+            color: #FFFFFF;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        textarea {
+            width: calc(100% - 12px);
+        }
+
+        button {
+            background-color: #0D1C40;
+            color: white;
+            padding: 8px 15px;
+            border: 4px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        button:hover {
+            background-color: #1A2C56;
+        }
+
+        .buttons {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .text-input-wrapper {
+            position: relative;
+        }
+
+        .clear-text-button {
+            position: absolute;
+            top: 5px;
+            right: 15px; /* Moved 10px to the left */
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #0D1C40; /* Same color as other buttons */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.8em;
+            border: 1px solid white; /* Add a white border */
+        }
+
+        .key-input-wrapper {
+            position: relative;
+        }
+
+        .show-password-group {
+            position: absolute;
+            top: 50%;
+            right: 15px; /* Moved 10px to the left */
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .show-password-group input[type="checkbox"] {
+            width: auto;
+            margin-left: 5px;
+        }
+
+        .result-input-wrapper {
+            position: relative;
+            width: 100%; /* Take full width of the input group */
+        }
+
+        .result-copy-button {
+            position: absolute;
+            top: 5px;
+            right: 15px; /* Pushed 10px to the left (5px + 10px) */
+            background-color: #0D1C40;
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 3px 6px;
+            font-size: 0.7em;
+            transition: background-color 0.3s;
+        }
+
+        .result-copy-button:hover {
+            background-color: #1A2C56;
+        }
+
+        #popup-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+      <link rel="manifest" href="/manifest.json">
+    <meta name="google-site-verification" content="rh5Uzp74tmYRX1PDEYv_SVP8fO_f5jKeNovku1DUY9k" />
+</head>
+<body>
+    <div class="container">
+        <h1>HMB-TECH <br>
+        DÉCRYPT AND CRYPT</h1>
+
+        <div class="input-group">
+            <label for="algorithm">Algorithme :</label>
+            <select id="algorithm">
+                <option value="aes">AES</option>
+                <option value="tripledes">Triple DES</option>
+                <option value="rc4">RC4</option>
+                <option value="rabbit">Rabbit</option>
+                <option value="hmac-sha256">HMAC-SHA256</option>
+                <option value="sha256">SHA256</option>
+                </select>
+        </div>
+
+        <div class="input-group">
+            <label for="key">Clé secrète :</label>
+            <div class="key-input-wrapper">
+                <input type="password" id="key" placeholder="Entrez votre clé secrète">
+                <div class="show-password-group">
+                    <label for="showKey">Afficher</label>
+                    <input type="checkbox" id="showKey" onclick="togglePasswordVisibility()">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="text">Texte :</label>
+            <div class="text-input-wrapper">
+                <textarea id="text" rows="4" placeholder="Entrez votre texte ici"></textarea>
+                <div class="clear-text-button" onclick="clearText()">×</div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button onclick="chiffrer()">Chiffrer</button>
+            <button onclick="dechiffrer()">Déchiffrer</button>
+        </div>
+
+        <div class="input-group">
+            <label for="result">Résultat :</label>
+            <div class="result-input-wrapper">
+                <textarea id="result" rows="4" readonly style="width: calc(100% - 12px);"></textarea>
+                <button type="button" class="result-copy-button" onclick="copierResultat()">Copier</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup-message"></div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const keyInput = document.getElementById('key');
+            const showKeyCheckbox = document.getElementById('showKey');
+            keyInput.type = showKeyCheckbox.checked ? "text" : "password";
+        }
+
+        function clearText() {
+            document.getElementById('text').value = '';
+        }
+
+        function showPopup(message) {
+            const popup = document.getElementById('popup-message');
+            popup.textContent = message;
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 2000); // Hide after 2 seconds
+        }
+
+        function chiffrer() {
+            const algorithm = document.getElementById('algorithm').value;
+            const texte = document.getElementById('text').value;
+            const cle = document.getElementById('key').value;
+
+            if (!texte || !cle) {
+                showPopup("Veuillez remplir les champs Texte et Clé secrète");
+                return;
+            }
+
+            let encrypted;
+
+            try {
+                switch (algorithm) {
+                    case 'aes':
+                        encrypted = CryptoJS.AES.encrypt(texte, cle).toString();
+                        break;
+                    case 'tripledes':
+                        encrypted = CryptoJS.TripleDES.encrypt(texte, cle).toString();
+                        break;
+                    case 'rc4':
+                        encrypted = CryptoJS.RC4.encrypt(texte, cle).toString();
+                        break;
+                    case 'rabbit':
+                        encrypted = CryptoJS.Rabbit.encrypt(texte, cle).toString();
+                        break;
+                    case 'hmac-sha256':
+                        encrypted = CryptoJS.HmacSHA256(texte, cle).toString();
+                        break;
+                    case 'sha256':
+                        encrypted = CryptoJS.SHA256(texte).toString();
+                        break;
+                    default:
+                        showPopup("Algorithme non supporté");
+                        return;
+                }
+                document.getElementById('result').value = encrypted;
+            } catch (e) {
+                showPopup("Erreur de chiffrement : " + e.message);
+            }
+        }
+
+        function dechiffrer() {
+            const algorithm = document.getElementById('algorithm').value;
+            const texteChiffre = document.getElementById('text').value;
+            const cle = document.getElementById('key').value;
+
+            if (!texteChiffre || !cle) {
+                showPopup("Veuillez remplir les champs Texte et Clé secrète");
+                return;
+            }
+
+            try {
+                let decryptedBytes;
+                switch (algorithm) {
+                    case 'aes':
+                        decryptedBytes = CryptoJS.AES.decrypt(texteChiffre, cle);
+                        break;
+                    case 'tripledes':
+                        decryptedBytes = CryptoJS.TripleDES.decrypt(texteChiffre, cle);
+                        break;
+                    case 'rc4':
+                        decryptedBytes = CryptoJS.RC4.decrypt(texteChiffre, cle);
+                        break;
+                    case 'rabbit':
+                        decryptedBytes = CryptoJS.Rabbit.decrypt(texteChiffre, cle);
+                        break;
+                    // HMAC-SHA256 et SHA256 sont des fonctions de hachage
+                    default:
+                        showPopup("Algorithme non supporté pour le déchiffrement direct");
+                        return;
+                }
+
+                const texteOriginal = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+                if (!texteOriginal && ['hmac-sha256', 'sha256'].includes(algorithm)) {
+                    document.getElementById('result').value = "(Ceci est une fonction de hachage, pas de déchiffrement)";
+                    return;
+                }
+
+                if (!texteOriginal) {
+                    throw new Error('Clé incorrecte ou données corrompues');
+                }
+
+                document.getElementById('result').value = texteOriginal;
+
+            } catch (e) {
+                showPopup("Erreur de déchiffrement : " + e.message);
+            }
+        }
+
+        function copierTexte() {
+            const texte = document.getElementById('text');
+            texte.select();
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            showPopup("Copié");
+        }
+
+        function copierResultat() {
+            const resultat = document.getElementById('result');
+            resultat.select();
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            showPopup("Copié");
+        }
+
+        function afficherCode() {
+            const texte = document.getElementById('text').value;
+            alert("Code : \n\n" + texte);
+        }
+    </script>
+</body>
+</html>
