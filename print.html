@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMB-TECH PDF PRINT</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #0D1C40;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1A2B53; /* Slightly lighter for contrast */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .upload-section, .iso-section, .print-section {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #eee;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #333;
+            color: #eee;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        select {
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #333;
+            color: #eee;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #imagePreviewContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview-item {
+            max-width: 150px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .image-preview-item img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HMB-TECH PDF PRINT</h1>
+
+        <div class="upload-section">
+            <label for="imageUpload">Choisir une ou plusieurs images :</label>
+            <input type="file" id="imageUpload" accept="image/*" multiple>
+            <div id="imagePreviewContainer"></div>
+        </div>
+
+        <div class="iso-section">
+            <label for="isoSelect">Sélectionner l'ISO :</label>
+            <select id="isoSelect">
+                <option value="A4">A4</option>
+                <option value="Letter">Lettre</option>
+                <option value="Legal">Légal</option>
+            </select>
+        </div>
+
+        <div class="print-section">
+            <button onclick="printImagesToPdf()">Imprimer en PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const isoSelect = document.getElementById('isoSelect');
+        let imageFiles = [];
+
+        imageUpload.addEventListener('change', function() {
+            imageFiles = Array.from(this.files);
+            imagePreviewContainer.innerHTML = ''; // Clear previous previews
+
+            imageFiles.forEach(file => {
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.classList.add('image-preview-item');
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewItem.appendChild(img);
+                        imagePreviewContainer.appendChild(previewItem);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        function printImagesToPdf() {
+            if (imageFiles.length === 0) {
+                alert('Veuillez choisir au moins une image.');
+                return;
+            }
+
+            const selectedIso = isoSelect.value;
+            const doc = new jspdf.jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: selectedIso.toLowerCase()
+            });
+
+            const headerText = 'HMB-TECH PDF PRINT';
+            const headerFontSize = 14;
+            const headerMarginTop = 20;
+
+            function addHeader(currentDoc) {
+                currentDoc.setFont('helvetica', 'bold');
+                currentDoc.setFontSize(headerFontSize);
+                const pageWidth = currentDoc.internal.pageSize.getWidth();
+                const headerWidth = currentDoc.getTextWidth(headerText, null, null, { fontSize: headerFontSize });
+                const headerX = (pageWidth - headerWidth) / 2;
+                currentDoc.text(headerText, headerX, headerMarginTop);
+            }
+
+            function addImageToPdf(file, index, callback) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const imgWidth = this.width;
+                        const imgHeight = this.height;
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        const availablePageHeight = pageHeight - headerMarginTop - 10; // Adjust for header and some margin
+
+                        let widthRatio = pageWidth / imgWidth;
+                        let heightRatio = availablePageHeight / imgHeight;
+                        let scaleFactor = Math.min(widthRatio, heightRatio);
+
+                        const scaledWidth = imgWidth * scaleFactor;
+                        const scaledHeight = imgHeight * scaleFactor;
+
+                        const x = (pageWidth - scaledWidth) / 2;
+                        const y = headerMarginTop + 10 + (availablePageHeight - scaledHeight) / 2;
+
+                        if (index > 0) {
+                            doc.addPage({
+                                orientation: 'portrait',
+                                unit: 'pt',
+                                format: selectedIso.toLowerCase()
+                            });
+                            addHeader(doc);
+                        } else {
+                            addHeader(doc);
+                        }
+                        doc.addImage(event.target.result, 'PNG', x, y, scaledWidth, scaledHeight);
+                        callback();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function processImages(index) {
+                if (index < imageFiles.length) {
+                    addImageToPdf(imageFiles[index], index, () => {
+                        processImages(index + 1);
+                    });
+                } else {
+                    doc.save('hmb-tech-print.pdf');
+                }
+            }
+
+            processImages(0);
+        }
+    </script>
+</body>
+</html>
