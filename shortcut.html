@@ -163,6 +163,16 @@
         .clear-input-button:focus {
             outline: none;
         }
+
+        /* Style pour le clignotement */
+        .blink {
+            animation: blink-animation 1s steps(2, start) 3;
+        }
+        @keyframes blink-animation {
+            to {
+                background-color: #0D1C39; /* Couleur des boutons */
+            }
+        }
     </style>
 </head>
 <body>
@@ -224,8 +234,9 @@
 
             // --- Validation URL Longue ---
             if (!longUrl) {
-                displayMessage("Veuillez entrer l'URL longue.", "error");
+                // Pas de message, le champ va clignoter
                 longUrlInput.focus();
+                blinkInput(longUrlInput);
                 return;
             }
             try {
@@ -234,8 +245,9 @@
                     throw new Error("Le schéma doit être http ou https.");
                 }
             } catch (_) {
-                displayMessage("URL longue invalide. Vérifiez le format (doit commencer par http:// ou https://).", "error");
+                // Pas de message, le champ va clignoter
                 longUrlInput.focus();
+                blinkInput(longUrlInput);
                 return;
             }
 
@@ -294,23 +306,7 @@
 
                 // Si l'alias est pris, on refait une requête sans alias après 3 secondes
                 if (aliasTaken) {
-                    displayMessage("L'alias est déjà pris, un lien aléatoire sera généré...", "info");
-                    setTimeout(async () => {
-                        const apiUrlNoAlias = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`;
-                        try {
-                            const responseNoAlias = await fetch(apiUrlNoAlias);
-                            const dataNoAlias = await responseNoAlias.json();
-                            if (dataNoAlias.shorturl) {
-                                displayResult(dataNoAlias.shorturl);
-                                customAliasInput.value = dataNoAlias.shorturl.split('/').pop(); // Afficher la fin de l'URL comme alias
-                            } else {
-                                displayMessage("Erreur lors de la génération du lien aléatoire.", "error");
-                            }
-                        } catch (error) {
-                            console.error("Erreur lors de l'appel fetch (sans alias) :", error);
-                            displayMessage(`Erreur de communication avec le service de raccourcissement. Vérifiez votre connexion internet. (${error.message})`, "error");
-                        }
-                    }, 3000);
+                    displayMessage("Cet alias est déjà associé à un autre lien. Veuillez en choisir un autre.", "error");
                 }
 
             } catch (error) {
