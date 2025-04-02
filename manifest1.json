@@ -1,7 +1,7 @@
 {
   "name": "shortcut HMB-TECH",
   "short_name": "shortcut",
-  "start_url": "/index.html",
+  "start_url": "/shortcut.html",
   "display": "standalone",
   "background_color": "#0D1C40",
   "theme_color": "#0D1C40",
