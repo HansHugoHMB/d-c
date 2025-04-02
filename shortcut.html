@@ -163,16 +163,6 @@
         .clear-input-button:focus {
             outline: none;
         }
-
-        /* Style pour le clignotement */
-        .blink {
-            animation: blink-animation 1s steps(2, start) 3;
-        }
-        @keyframes blink-animation {
-            to {
-                background-color: #0D1C39; /* Couleur des boutons */
-            }
-        }
     </style>
 </head>
 <body>
@@ -234,25 +224,23 @@
 
             // --- Validation URL Longue ---
             if (!longUrl) {
-                // Pas de message, le champ va clignoter
                 longUrlInput.focus();
                 blinkInput(longUrlInput);
                 return;
             }
             try {
-                new URL(longUrl); // Valide le format général
+                new URL(longUrl);
                 if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
                     throw new Error("Le schéma doit être http ou https.");
                 }
             } catch (_) {
-                // Pas de message, le champ va clignoter
                 longUrlInput.focus();
                 blinkInput(longUrlInput);
                 return;
             }
 
             // --- Validation Alias Personnalisé (si fourni) ---
-            const aliasPattern = /^[a-zA-Z0-9_-]+$/; // Lettres, chiffres, tiret, underscore
+            const aliasPattern = /^[a-zA-Z0-9_-]+$/;
             if (customAlias && !aliasPattern.test(customAlias)) {
                 displayMessage("Alias invalide. Utilisez uniquement lettres (a-z, A-Z), chiffres (0-9), tirets (-) et underscores (_).", "error");
                 customAliasInput.focus();
@@ -267,12 +255,8 @@
             displayMessage("Raccourcissement en cours...", "loading");
 
             // --- Appel à l'API is.gd ---
-            // format=json : pour recevoir une réponse structurée (facilite la gestion des erreurs)
-            // url=... : l'URL longue encodée
-            // shorturl=... : l'alias personnalisé suggéré (optionnel)
             let apiUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`;
             let aliasTaken = false;
-            let generatedShortUrl = null;
 
             if (customAlias) {
                 apiUrl += `&shorturl=${encodeURIComponent(customAlias)}`;
@@ -280,13 +264,11 @@
 
             try {
                 const response = await fetch(apiUrl);
-                const data = await response.json(); // is.gd retourne du JSON
+                const data = await response.json();
 
                 if (data.errorcode) {
-                    // Gestion spécifique des erreurs de is.gd
                     let userErrorMessage = `Erreur ${data.errorcode}: ${data.errormessage}`;
-                    console.error("Erreur API is.gd:", data); // Log détaillé pour le débogage
-                     // Améliorer les messages pour l'utilisateur
+                    console.error("Erreur API is.gd:", data);
                      if (data.errorcode === 1) userErrorMessage = "Erreur : L'URL fournie n'est pas valide ou est bloquée.";
                      else if (data.errorcode === 2) {
                          aliasTaken = true;
@@ -296,17 +278,31 @@
                     else displayMessage(userErrorMessage, "error");
 
                 } else if (data.shorturl) {
-                    // Succès !
                     displayResult(data.shorturl);
-                    return; // Stop here if successful with custom alias
+                    return;
                 } else {
-                    // Réponse inattendue
                     throw new Error("Réponse inattendue de l'API is.gd");
                 }
 
                 // Si l'alias est pris, on refait une requête sans alias après 3 secondes
                 if (aliasTaken) {
-                    displayMessage("Cet alias est déjà associé à un autre lien. Veuillez en choisir un autre.", "error");
+                    displayMessage("L'alias est déjà pris, un lien aléatoire sera généré...", "info");
+                    setTimeout(async () => {
+                        const apiUrlNoAlias = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`;
+                        try {
+                            const responseNoAlias = await fetch(apiUrlNoAlias);
+                            const dataNoAlias = await responseNoAlias.json();
+                            if (dataNoAlias.shorturl) {
+                                displayResult(dataNoAlias.shorturl);
+                                customAliasInput.value = dataNoAlias.shorturl.split('/').pop(); // Afficher la fin de l'URL comme alias
+                            } else {
+                                displayMessage("Erreur lors de la génération du lien aléatoire.", "error");
+                            }
+                        } catch (error) {
+                            console.error("Erreur lors de l'appel fetch (sans alias) :", error);
+                            displayMessage(`Erreur de communication avec le service de raccourcissement. Vérifiez votre connexion internet. (${error.message})`, "error");
+                        }
+                    }, 3000);
                 }
 
             } catch (error) {
@@ -317,23 +313,21 @@
 
         // --- Fonctions d'affichage ---
 
-        function displayMessage(message, type = "info") { // type: 'info', 'success', 'error', 'loading'
+        function displayMessage(message, type = "info") {
              resultArea.innerHTML = `<span class="message ${type}">${message}</span>`;
          }
 
         function displayResult(shortUrl) {
-            resultArea.innerHTML = ''; // Nettoyer
-             resultArea.className = ''; // Reset class
+            resultArea.innerHTML = '';
+             resultArea.className = '';
              resultArea.style.backgroundColor = '#0D1C39';
              resultArea.style.border = '1px solid white';
 
-            // Texte "URL Raccourcie :"
             const textNode = document.createElement('span');
              textNode.textContent = "Lien raccourci : ";
              textNode.style.color = '#f8f9fa';
              resultArea.appendChild(textNode);
 
-            // Lien cliquable
             const linkElement = document.createElement('a');
             linkElement.href = shortUrl;
             linkElement.textContent = shortUrl;
@@ -341,7 +335,6 @@
             linkElement.rel = 'noopener noreferrer';
             resultArea.appendChild(linkElement);
 
-            // Bouton "Copier"
             const copyButton = document.createElement('button');
             copyButton.textContent = 'Copier';
             copyButton.classList.add('copy-button');
