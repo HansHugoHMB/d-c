@@ -15,12 +15,26 @@
             color: #FFFFFF;
             font-family: 'Boldonce', sans-serif; /* Apply Boldonce font */
             display: flex;
+            flex-direction: column; /* Changed to column to stack items */
             justify-content: center; /* Center horizontally */
             align-items: center; /* Center vertically */
             min-height: 100vh; /* Ensure full viewport height */
             margin: 0;
             padding: 10px;
             box-sizing: border-box;
+        }
+
+        /* Style for the image container */
+        .image-container {
+            width: 100%; /* Make the container take full width */
+            display: flex;
+            justify-content: center; /* Center the image horizontally within the container */
+            margin-bottom: 20px; /* Add some space below the image */
+        }
+
+        .image-container img {
+            max-width: 100px; /* Adjust the maximum width as needed */
+            height: auto; /* Maintain aspect ratio */
         }
 
         .container {
@@ -199,6 +213,10 @@
     <meta name="google-site-verification" content="rh5Uzp74tmYRX1PDEYv_SVP8fO_f5jKeNovku1DUY9k" />
 </head>
 <body>
+   <div class="image-container">
+    <img src="https://raw.githubusercontent.com/HansHugoHMB/Images/main/loading.svg" alt="Loading Image">
+</div>
+
     <div class="container">
         <h1>HMB-TECH <br>
         DÉCRYPT AND CRYPT</h1>
