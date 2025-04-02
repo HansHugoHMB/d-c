@@ -123,7 +123,7 @@
         .copy-button:hover { background-color: #1a294a; }
         .copy-button:active { background-color: #1a294a; }
         .message { padding: 10px; border-radius: 4px; }
-        .error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .error { color: #f8f9fa; background-color: #0D1C39; border: 1px solid white; }
         .loading { color: #0c5460; background-color: #d1ecf1; border: 1px solid #bee5eb; }
         .success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
 
@@ -162,6 +162,16 @@
         }
         .clear-input-button:focus {
             outline: none;
+        }
+
+        /* Style pour le clignotement */
+        .blink {
+            animation: blink-animation 1s steps(2, start) 3;
+        }
+        @keyframes blink-animation {
+            to {
+                background-color: #0D1C39; /* Couleur des boutons */
+            }
         }
     </style>
 </head>
@@ -242,7 +252,7 @@
             // --- Validation Alias Personnalisé (si fourni) ---
             const aliasPattern = /^[a-zA-Z0-9_-]+$/;
             if (customAlias && !aliasPattern.test(customAlias)) {
-                displayMessage("Alias invalide. Utilisez uniquement lettres (a-z, A-Z), chiffres (0-9), tirets (-) et underscores (_).", "error");
+                displayMessage("[espace non permis]", "error");
                 customAliasInput.focus();
                 return;
             }
