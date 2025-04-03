@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Familles de la RDC</title>
+    <style>
+        body {
+            background-color: #0D1C40;
+            color: white;
+            font
+            -family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 15px;
+            border-radius: 15px;
+            background-color: #0D1C45; /* Couleur mise à jour */
+            padding: 20px;
+            width: 80%; /* Adjust width as needed */
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .question-div {
+            background-color: #0D1C49; /* Couleur mise à jour */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid white; /* Ajout de bordure blanche */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: white; /* Couleur du texte mise à jour */
+        }
+
+        label.required::after {
+            content: " *";
+            color: red;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #44526E;
+            border-radius: 4px;
+            background-color: white; /* Couleur mise à jour */
+            color: black; /* Assurez-vous que le texte est lisible sur fond blanc */
+            box-sizing: border-box;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .language-options label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdAnHPeOMtPYOnBMPa3Y0fR4cQLWkCo_kowhsSMzrhTiviQEQ/formResponse" method="POST" target="hidden_iframe">
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="email" class="required">Adresse e-mail</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.245732986" class="required">Nom de la famille</label>
+                            <input type="text" id="entry.245732986" name="entry.245732986" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.500196284" class="required">Origine de la famille</label>
+                            <textarea id="entry.500196284" name="entry.500196284" rows="3" required>Ici il s'agit de votre province d'origine, votre ville, votre village. M</textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.57448426" class="required">Ethnie ou tribu</label>
+                            <input type="text" id="entry.57448426" name="entry.57448426" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.477461007">Devise de la famille</label>
+                            <input type="text" id="entry.477461007" name="entry.477461007" value="M">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1408096422" class="required">Nombre total d'enfants dans la famille</label>
+                            <input type="number" id="entry.1408096422" name="entry.1408096422" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">2. Informations sur le chef de la famille</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.265132179" class="required">Nom complet</label>
+                            <input type="text" id="entry.265132179" name="entry.265132179" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="chef_naissance" class="required">Date et lieu de naissance</label>
+                            <input type="date" id="chef_naissance_date" name="chef_naissance_date" value="M" required>
+                            <input type="text" id="chef_naissance_lieu" name="chef_naissance_lieu" value="M" placeholder="Lieu de naissance" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1747812007" class="required">Profession</label>
+                            <input type="text" id="entry.1747812007" name="entry.1747812007" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1592467293">Téléphone/watsapp</label>
+                            <input type="text" id="entry.1592467293" name="entry.1592467293" value="M">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.164967613" class="required">Adresse e-mail</label>
+                            <input type="email" id="entry.164967613" name="entry.164967613" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">Arbre généalogique</h3>
+                        <p style="color: white;">Noms des grands parents (paternels et maternels)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1092594051" class="required">Noms des grands parents (paternels et maternels)</label>
+                            <textarea id="entry.1092594051" name="entry.1092594051" rows="3" required>M</textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1256910924" class="required">Noms des parents (père et mère)</label>
+                            <textarea id="entry.1256910924" name="entry.1256910924" rows="2" required>M</textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.953954617" class="required">Nombres d'enfants et noms</label>
+                            <textarea id="entry.953954617" name="entry.953954617" rows="3" required>M</textarea>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">4. Informations sur les membres de la famille (à remplir pour chaque membre)</h3>
+                        <p style="color: white;">(Veuillez ajouter des sections pour chaque membre de la famille si nécessaire)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_nom_complet" class="required">Nom complet</label>
+                            <input type="text" id="membre_nom_complet" name="membre_nom_complet" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_date_naissance" class="required">Date de naissance</label>
+                            <input type="date" id="membre_date_naissance" name="membre_date_naissance" value="Date" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_lieu_naissance" class="required">Lieu de naissance</label>
+                            <input type="text" id="membre_lieu_naissance" name="membre_lieu_naissance" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_sexe" class="required">Sexe</label>
+                            <div>
+                                <input type="radio" id="membre_sexe_m" name="membre_sexe" value="M" checked>
+                                <label for="membre_sexe_m">M</label>
+                                <input type="radio" id="membre_sexe_f" name="membre_sexe" value="F">
+                                <label for="membre_sexe_f">F</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_etat_civil" class="required">État civil</label>
+                            <select id="membre_etat_civil" name="membre_etat_civil" required>
+                                <option value="Célibataire" selected>Célibataire</option>
+                                <option value="Marié">Marié</option>
+                                <option value="Divorcé">Divorcé</option>
+                                <option value="Veuve (veuf)">Veuve (veuf)</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_profession" class="required">Profession</label>
+                            <input type="text" id="membre_profession" name="membre_profession" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_pays_ville" class="required">Pays/ ville de résidence</label>
+                            <input type="text" id="membre_pays_ville" name="membre_pays_ville" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_telephone" class="required">Numéro de téléphone/ wattsap</label>
+                            <input type="text" id="membre_telephone" name="membre_telephone" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="membre_email" class="required">Adresse e-mail</label>
+                            <input type="email" id="membre_email" name="membre_email" value="M" required>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">5. Histoire et Culture Familiale</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.1538147244" class="required">Origine et histoire de la famille (brève description)</label>
+                            <textarea id="entry.1538147244" name="entry.1538147244" rows="5" required>M</textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.2033137147" class="required">Langue(s) parlée(s) dans la famille</label>
+                            <div class="language-options">
+                                <input type="checkbox" id="langue_tshiluba" name="langues[]" value="Tshiluba" checked>
+                                <label for="langue_tshiluba" style="display: inline;">Tshiluba</label>
+                                <input type="checkbox" id="langue_lingala" name="langues[]" value="Lingala" checked>
+                                <label for="langue_lingala" style="display: inline;">Lingala</label>
+                                <input type="checkbox" id="langue_kikongo" name="langues[]" value="Kikongo" checked>
+                                <label for="langue_kikongo" style="display: inline;">Kikongo</label>
+                                <input type="checkbox" id="langue_swahili" name="langues[]" value="Swahili" checked>
+                                <label for="langue_swahili" style="display: inline;">Swahili</label>
+                                <input type="checkbox" id="langue_francais" name="langues[]" value="Français" checked>
+                                <label for="langue_francais" style="display: inline;">Français</label>
+                                <input type="checkbox" id="langue_anglais" name="langues[]" value="Anglais" checked>
+                                <label for="langue_anglais" style="display: inline;">Anglais</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="entry.885539090" class="required">Traditions ou fêtes familiales importantes</label>
+                            <textarea id="entry.885539090" name="entry.885539090" rows="3" required>M</textarea>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="photo_famille">Si possible, partager une photo de famille ou un document historique</label>
+                            <input type="file" id="photo_famille" name="photo_famille">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">6. Réseaux et contact</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="whatsapp_groupe" class="required">Souhaitez-vous être ajouté à un groupe WhatsApp pour connecter les familles congolaises ? (Oui / Non)</label>
+                            <div>
+                                <input type="radio" id="whatsapp_oui" name="whatsapp_groupe" value="Oui" checked required>
+                                <label for="whatsapp_oui">Oui</label>
+                                <input type="radio" id="whatsapp_non" name="whatsapp_groupe" value="Non">
+                                <label for="whatsapp_non">Non</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="rencontres" class="required">Acceptez-vous d’être contacté pour des rencontres ou des événements familiaux ? (Oui / Non)</label>
+                            <div>
+                                <input type="radio" id="rencontres_oui" name="rencontres" value="Oui" checked required>
+                                <label for="rencontres_oui">Oui</label>
+                                <input type="radio" id="rencontres_non" name="rencontres" value="Non">
+                                <label for="rencontres_non">Non</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="autres_commentaires">Autres commentaires ou suggestions</label>
+                            <textarea id="autres_commentaires" name="autres_commentaires" rows="3">M</textarea>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="background-color: #0D1C45; padding: 20px; border-radius: 15px;">
+                        <h3 style="color: white; margin-top: 0;">7. Consentement et Confidentialité</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="consentement_enregistrement" class="required">Acceptez-vous que vos informations soient enregistrées dans la base de données du projet "Ma Grande Famille" ? (Oui / Non)</label>
+                            <div>
+                                <input type="radio" id="consentement_oui" name="consentement_enregistrement" value="Oui" checked required>
+                                <label for="consentement_oui">Oui</label>
+                                <input type="radio" id="consentement_non" name="consentement_enregistrement" value="Non">
+                                <label for="consentement_non">Non</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="question-div">
+                            <label for="consentement_publication" class="required">Autorisez-vous la publication de certaines données (nom de famille, origine, histoire) sur une plateforme publique ? (Oui / Non)</label>
+                            <div>
+                                <input type="radio" id="consentement_publication_oui" name="consentement_publication" value="Oui" checked required>
+                                <label for="consentement_publication_oui">Oui</label>
+                                <input type="radio" id="consentement_publication_non" name="consentement_publication" value="Non">
+                                <label for="consentement_publication_non">Non</label>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button type="submit">Envoyer</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <iframe name="hidden_iframe" style="display:none;"></iframe>
+    </form>
+</body>
+</html>
