@@ -1,0 +1,35 @@
+{
+  "name": "DRC FAMILY",
+  "short_name": "DRC FAMILY",
+  "start_url": "/family forms.html",
+  "display": "standalone",
+  "background_color": "#0D1C40",
+  "theme_color": "#0D1C40",
+  "scope": "/",
+  "description": "Application pour la préparation H25",
+  "orientation": "any",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://prepa-h.pages.dev/"
+    },
+    {
+      "platform": "webapp",
+      "url": "https://prepa.pages.dev/"
+    },
+    {
+      "platform": "webapp",
+      "url": "https://mbayamuambahans.home.blog/"
+    }
+  ],
+  "prefer_related_applications": false,
+  "screenshots": [],
+  "categories": ["education", "productivity"],
+  "lang": "fr-FR",
+  "dir": "ltr",
+  "serviceworker": {
+    "src": "/service-worker.js",
+    "scope": "/"
+  },
+  "version": "03.2025_HMB-TECH"
+}
