@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Iframe avec page de chargement</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HMB-TECH SCORE</title>
   <style>
     html, body {
       margin: 0;
@@ -10,23 +11,32 @@
       height: 100%;
       background-color: #0D1C40;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     body {
       box-sizing: border-box;
-      border: 2px solid white; /* contour blanc de 1mm */
+      border: 1mm solid #0D1C40;
+      border-bottom-left-radius: 5mm;
+      border-bottom-right-radius: 5mm;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      height: 2cm;
+      background-color: #0D1C40;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      font-weight: bold;
     }
 
     .iframe-wrapper {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: calc(100vh - 2cm);
       background-color: white;
-      padding: 1px;
-      box-sizing: border-box;
       overflow: hidden;
     }
 
@@ -34,12 +44,22 @@
       position: absolute;
       top: -0.7cm;
       left: 0;
-      width: calc(100vw + 0.5cm - 4px);
-      height: calc(100vh + 1.9cm - 4px);
+      width: calc(100vw + 0.5cm);
+      height: calc(100vh - 2cm + 1.7cm);
       border: none;
-      background-color: transparent;
-      clip-path: path('M0,0 H100% Vcalc(100% - 5mm) Q100% 100% calc(100% - 5mm) 100% H5mm Q0 100% 0 calc(100% - 5mm) Z');
+      filter: invert(1) hue-rotate(180deg) saturate(2) brightness(0.6) contrast(1.1);
       z-index: 1;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(13, 28, 64, 0.2);
+      pointer-events: none;
+      z-index: 2;
     }
 
     .loading-page {
@@ -52,32 +72,29 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 2;
+      z-index: 3;
     }
 
     .loading-page img {
-      width: 80px; /* ajuste la taille de l'image de chargement */
-      height: auto;
+      width: 60px;
+      height: 60px;
     }
   </style>
 </head>
 <body>
   <div class="loading-page">
-    <img src="https://github.com/HansHugoHMB/Images/blob/main/loading.svg?raw=true" alt="Loading...">
+    <img src="https://github.com/HansHugoHMB/Images/raw/main/loading.svg" alt="Chargement...">
   </div>
+
+  <header>HMB-TECH SCORE</header>
+
   <div class="iframe-wrapper">
     <iframe 
       src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxmFTY4ufo4fyJMFVrIHdGNgAdL3c5JeCKpoaIHSjaxFV3PrLykKoGPpTTKkqY3fTrkpgUp--0Vodi/pubhtml?widget=true&amp;headers=false"
-      allowfullscreen onload="hideLoading()">
+      allowfullscreen
+      onload="setTimeout(() => document.querySelector('.loading-page').style.display='none', 5000)">
     </iframe>
+    <div class="overlay"></div>
   </div>
-
-  <script>
-    function hideLoading() {
-      setTimeout(function() {
-        document.querySelector('.loading-page').style.display = 'none';
-      }, 5000); // la page de chargement disparaît après 5 secondes
-    }
-  </script>
 </body>
-</html>
+</html> 
