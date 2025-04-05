@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Iframe avec page de chargement</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0D1C40;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body {
+      box-sizing: border-box;
+      border: 2px solid white; /* contour blanc de 1mm */
+    }
+
+    .iframe-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background-color: white;
+      padding: 1px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    iframe {
+      position: absolute;
+      top: -0.7cm;
+      left: 0;
+      width: calc(100vw + 0.5cm - 4px);
+      height: calc(100vh + 1.9cm - 4px);
+      border: none;
+      background-color: transparent;
+      clip-path: path('M0,0 H100% Vcalc(100% - 5mm) Q100% 100% calc(100% - 5mm) 100% H5mm Q0 100% 0 calc(100% - 5mm) Z');
+      z-index: 1;
+    }
+
+    .loading-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0D1C40;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .loading-page img {
+      width: 80px; /* ajuste la taille de l'image de chargement */
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-page">
+    <img src="https://github.com/HansHugoHMB/Images/blob/main/loading.svg?raw=true" alt="Loading...">
+  </div>
+  <div class="iframe-wrapper">
+    <iframe 
+      src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxmFTY4ufo4fyJMFVrIHdGNgAdL3c5JeCKpoaIHSjaxFV3PrLykKoGPpTTKkqY3fTrkpgUp--0Vodi/pubhtml?widget=true&amp;headers=false"
+      allowfullscreen onload="hideLoading()">
+    </iframe>
+  </div>
+
+  <script>
+    function hideLoading() {
+      setTimeout(function() {
+        document.querySelector('.loading-page').style.display = 'none';
+      }, 5000); // la page de chargement disparaît après 5 secondes
+    }
+  </script>
+</body>
+</html>
