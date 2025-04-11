@@ -1,0 +1,15 @@
+# robots.txt pour d-c-hmb-tech.pages.dev
+User-agent: *
+Allow: /
+
+# Permettre l'accès à toutes les pages HTML
+Allow: /*.html$
+
+# Sitemap
+Sitemap: https://d-c-hmb-tech.pages.dev/sitemap.xml
+
+# Éviter l'indexation de la page hors ligne
+Disallow: /offline.html
+
+# Optimisation du crawl
+Crawl-delay: 10
