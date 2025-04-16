@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Gestionnaire de Dépôts GitHub</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #0D1C40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f6f8fp;
+            background-image: url('https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%[...]');
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            display: none;
+            transform: scale(1);
+        }
+
+        .container {
+            background-color: white;
+            padding: 22px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            margin-bottom: 20px;
+            max-width: 100%;
+            transform: scale(1);
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .repo-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f1f8ff;
+            border-radius: 6px;
+            transform: scale(1);
+        }
+
+        .file-list {
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            margin: 20px 0;
+            max-height: 500px;
+            overflow-y: auto;
+            transform: scale(1);
+        }
+
+        .file-item {
+            padding: 12px;
+            border-bottom: 1px solid #d0d7de;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: scale(1);
+        }
+
+        .file-item:hover {
+            background-color: #f6f8fa;
+            transform: scale(1);
+        }
+
+        .file-item span {
+            word-break: break-word;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            transform: scale(1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            font-family: monospace;
+            transform: scale(1);
+        }
+
+        button {
+            background-color: #2ea44f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 5px;
+            transform: scale(1);
+        }
+
+        button.delete { background-color: #cf222e; transform: scale(1); }
+        button.refresh { background-color: #0969da; transform: scale(1); }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            transform: scale(1);
+        }
+
+        .success { background-color: #dafbe1; color: #1a7f37; transform: scale(1); }
+        .error { background-color: #ffebe9; color: #cf222e; transform: scale(1); }
+
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            transform: scale(1);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .code-info {
+            background: #f6f8fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+            transform: scale(1);
+        }
+
+        #otp-popup {
+            background-color: #0D1C49;
+            background-image: url('https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%[...]');
+            background-color: #0D1C40;
+            border: 2px solid white;
+            padding: 20px;
+            box-shadow: 0 0 10px white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 250px;
+            text-align: center;
+            transform: scale(1);
+        }
+
+        #otp-popup h3 {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 16px;
+            transform: scale(1);
+        }
+
+        #otp-input {
+            width: 80%;
+            padding: 8px;
+            font-size: 18px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            background: white;
+            color: #0D1C40;
+            transform: scale(1);
+        }
+
+        #otp-input:focus {
+            outline: none;
+            box-shadow: 0 0 5px #fff;
+            transform: scale(1);
+        }
+
+        .message-popup {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%) scale(1);
+            background: white;
+            color: #0D1C40;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #fff;
+            font-weight: bold;
+            z-index: 10000;
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jssha/dist/sha.min.js"></script>
+</head>
+<body>
+
+<div id="otp-popup">
+    <h3>Authentification TOTP</h3>
+    <input type="text" id="otp-input" maxlength="6" placeholder="Code à 6 chiffres">
+</div>
+
+<div id="token-completion-popup" style="display: none; background-color: #0D1C49; border: 2px solid white; padding: 20px; box-shadow: 0 0 10px white; border-radius: 10px; width: 90%; max-width: 250px; text-align: center;">
+    <h3 style="color: white; margin-bottom: 12px; font-size: 16px;">Complétez le token</h3>
+    <input type="text" id="token-completion" maxlength="3" placeholder="3 derniers caractères" style="width: 80%; padding: 8px; font-size: 18px; text-align: center; border: none; border-radius: 5px; background: white; color: #0D1C40;">
+</div>
+
+<div id="success-popup" class="message-popup">Succès : Code valide !</div>
+<div id="error-popup" class="message-popup">Code incorrect</div>
+
+<div class="app-container">
+    <div class="container">
+        <h1>Gestionnaire de Dépôts GitHub</h1>
+
+        <div class="repo-selector">
+            <h2>Sélection du dépôt</h2>
+            <select id="repoSelect" onchange="loadFiles()">
+                <option value="">Chargement des dépôts...</option>
+            </select>
+            <button class="refresh" onclick="loadRepos()">Rafraîchir les dépôts</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="fileManager" style="display: none;">
+            <h2>Fichiers du dépôt</h2>
+            <button class="refresh" onclick="loadFiles()">Rafraîchir la liste</button>
+
+            <div class="file-list" id="fileList">
+                Sélectionnez un dépôt...
+            </div>
+
+            <h2>Ajouter un nouveau fichier</h2>
+            <input type="text" id="fileName" placeholder="Nom du fichier (ex: index.html)">
+            <textarea id="fileContent" placeholder="Contenu du fichier"></textarea>
+            <button onclick="addFile()">Ajouter le fichier</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="delete-modal">
+        <div class="modal-content">
+            <h2>Confirmer la suppression</h2>
+            <p>Pour supprimer <strong id="fileToDelete"></strong>, entrez le code :</p>
+            <div class="code-info" id="confirmationCode"></div>
+            <input type="text" id="confirmInput" placeholder="Code de confirmation">
+            <button onclick="confirmDelete()">Confirmer</button>
+            <button onclick="closeDeleteModal()" style="background-color: #666;">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const GITHUB_TOKEN_BASE = 'ghp_FdhLrRA2VYSXENmPbV5ZtDeFBCAeNc2xp';
+    let GITHUB_TOKEN = '';
+    const API_BASE = 'https://api.github.com';
+    let currentFileSha = '';
+    let currentFileName = '';
+    const secret = "HMBTECHAUTHMUAMBAAAAAAAAAA";
+
+    function getCurrentDateTime() {
+        const now = new Date();
+        const year = now.getUTCFullYear();
+        const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(now.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    async function loadRepos() {
+        try {
+            const response = await fetch(`${API_BASE}/user/repos`, {
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Erreur lors du chargement des dépôts');
+
+            const repos = await response.json();
+            const select = document.getElementById('repoSelect');
+            select.innerHTML = '<option value="">Sélectionnez un dépôt</option>';
+
+            repos.forEach(repo => {
+                const option = document.createElement('option');
+                option.value = repo.full_name;
+                option.textContent = repo.full_name;
+                select.appendChild(option);
+            });
+
+            showStatus('Liste des dépôts mise à jour', 'success');
+        } catch (error) {
+            showStatus(`Erreur: ${error.message}`, 'error');
+        }
+    }
+
+    async function loadFiles() {
+        const repoName = document.getElementById('repoSelect').value;
+        const fileManager = document.getElementById('fileManager');
+        const fileList = document.getElementById('fileList');
+
+        if (!repoName) {
+            fileManager.style.display = 'none';
+            return;
+        }
+
+        fileManager.style.display = 'block';
+        fileList.innerHTML = 'Chargement...';
+
+        try {
+            const response = await fetch(`${API_BASE}/repos/${repoName}/contents`, {
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!response.ok) throw new Error('Erreur lors du chargement des fichiers');
+
+            const files = await response.json();
+            fileList.innerHTML = '';
+
+            files.forEach(file => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'file-item';
+                fileElement.innerHTML = `
+                    <span>${file.name}</span>
+                    <button class="delete" onclick="showDeleteModal('${file.name}', '${file.sha}')">Supprimer</button>
+                `;
+                fileList.appendChild(fileElement);
+            });
+        } catch (error) {
+            showStatus(`Erreur: ${error.message}`, 'error');
+        }
+    }
+
+    function showDeleteModal(fileName, sha) {
+        currentFileName = fileName;
+        currentFileSha = sha;
+        const modal = document.getElementById('deleteModal');
+        const fileNameElement = document.getElementById('fileToDelete');
+        const codeElement = document.getElementById('confirmationCode');
+        const code = `HMB-TECH${getCurrentDateTime()}`;
+
+        fileNameElement.textContent = fileName;
+        codeElement.textContent = code;
+        modal.style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('confirmInput').value = '';
+    }
+
+    async function confirmDelete() {
+        const repoName = document.getElementById('repoSelect').value;
+        const confirmInput = document.getElementById('confirmInput').value;
+        const expectedCode = `HMB-TECH${getCurrentDateTime()}`;
+
+        if (confirmInput !== expectedCode) {
+            showStatus('Code de confirmation incorrect', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/repos/${repoName}/contents/${currentFileName}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Suppression de ${currentFileName}`,
+                    sha: currentFileSha
+                })
+            });
+
+            if (!response.ok) throw new Error('Erreur lors de la suppression');
+
+            showStatus(`Fichier ${currentFileName} supprimé`, 'success');
+            closeDeleteModal();
+            loadFiles();
+        } catch (error) {
+            showStatus(`Erreur: ${error.message}`, 'error');
+        }
+    }
+
+    async function addFile() {
+        const repoName = document.getElementById('repoSelect').value;
+        const fileName = document.getElementById('fileName').value;
+        const content = document.getElementById('fileContent').value;
+
+        if (!fileName || !content) {
+            showStatus('Veuillez remplir tous les champs', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/repos/${repoName}/contents/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Ajout de ${fileName}`,
+                    content: btoa(content)
+                })
+            });
+
+            if (!response.ok) throw new Error('Erreur lors de l\'ajout du fichier');
+
+            showStatus(`Fichier ${fileName} ajouté avec succès`, 'success');
+            document.getElementById('fileName').value = '';
+            document.getElementById('fileContent').value = '';
+            loadFiles();
+        } catch (error) {
+            showStatus(`Erreur: ${error.message}`, 'error');
+        }
+    }
+
+    function showStatus(message, type) {
+        const statusElement = document.getElementById('status');
+        statusElement.textContent = message;
+        statusElement.className = `status ${type}`;
+    }
+
+    function base32toHex(base32) {
+        const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        let bits = "", hex = "";
+        base32 = base32.replace(/=+$/, '');
+        for (let i = 0; i < base32.length; i++) {
+            const val = base32chars.indexOf(base32.charAt(i).toUpperCase());
+            bits += val.toString(2).padStart(5, '0');
+        }
+        for (let i = 0; i + 4 <= bits.length; i += 4) {
+            hex += parseInt(bits.substr(i, 4), 2).toString(16);
+        }
+        return hex;
+    }
+
+    function getTOTP(secret) {
+        const key = base32toHex(secret);
+        const epoch = Math.floor(new Date().getTime() / 1000.0);
+        const time = Math.floor(epoch / 30).toString(16).padStart(16, '0');
+        const shaObj = new jsSHA("SHA-1", "HEX");
+        shaObj.setHMACKey(key, "HEX");
+        shaObj.update(time);
+        const hmac = shaObj.getHMAC("HEX");
+        const offset = parseInt(hmac.substring(hmac.length - 1), 16);
+        const binary = parseInt(hmac.substr(offset * 2, 8), 16) & 0x7fffffff;
+        return (binary % 1000000).toString().padStart(6, '0');
+    }
+
+    function showMessage(id) {
+        const popup = document.getElementById(id);
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 2000);
+    }
+
+    document.getElementById("otp-input").addEventListener("input", function() {
+        const input = this.value.trim();
+        if (input.length === 6) {
+            const otp = getTOTP(secret);
+            if (input === otp) {
+                showMessage("success-popup");
+                setTimeout(() => {
+                    document.getElementById("otp-popup").style.display = 'none';
+                    document.getElementById("token-completion-popup").style.display = 'flex';
+                }, 2000);
+            } else {
+                showMessage("error-popup");
+                this.value = "";
+                this.focus();
+            }
+        }
+    });
+
+    document.getElementById("token-completion").addEventListener("input", function() {
+        const input = this.value.trim();
+        if (input.length === 3) {
+            if (input === 'MaI') {
+                GITHUB_TOKEN = GITHUB_TOKEN_BASE + input;
+                document.getElementById("token-completion-popup").style.display = 'none';
+                document.querySelector(".app-container").style.display = 'flex';
+                loadRepos();
+            } else {
+                showMessage("error-popup");
+                this.value = "";
+                this.focus();
+            }
+        }
+    });
+
+    window.onload = () => {
+        document.getElementById("otp-input").focus();
+    };
+</script>
+
+</body>
+</html>
