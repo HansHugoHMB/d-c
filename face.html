@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Détection Faciale Mobile avec Face-API.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/dist/face-api.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+        #videoContainer { position: relative; margin-bottom: 20px; border: 1px solid #ccc; }
+        #video { display: block; width: 100%; max-width: 640px; height: auto; } /* Adapté pour être plus flexible sur mobile */
+        #overlayCanvas { position: absolute; top: 0; left: 0; pointer-events: none; width: 100%; height: 100%; } /* Adapté */
+        #controls { margin-bottom: 20px; }
+        #controls button { margin: 0 5px; padding: 10px 15px; font-size: 1em; cursor: pointer; }
+        #jsonOutput { margin-top: 20px; width: 95%; max-width: 700px; white-space: pre-wrap; word-wrap: break-word; background-color: #f8f8f8; padding: 15px; border: 1px solid #ddd; border-radius: 5px; min-height: 100px; overflow: auto; font-size: 0.9em; } /* Adapté pour mobile */
+        h1, h2 { text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Détection Faciale Mobile</h1>
+    <p>Assurez-vous que la page est servie via HTTPS sur votre téléphone.</p>
+
+    <div id="videoContainer">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlayCanvas"></canvas>
+    </div>
+
+    <div id="controls">
+        <button id="startButton" disabled>Démarrer la Caméra</button>
+        <button id="stopButton" disabled>Arrêter la Caméra</button>
+    </div>
+
+    <h2>Données Faciales (JSON) :</h2>
+    <pre id="jsonOutput">Chargement des modèles de détection...</pre>
+
+    <script>
+        const videoElement = document.getElementById('video');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const jsonOutputElement = document.getElementById('jsonOutput');
+
+        let cameraStream = null;
+        let detectionIntervalId = null;
+        const DETECTION_INTERVAL_MS = 100;
+        let modelsLoaded = false;
+
+        async function loadModels() {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model/';
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+
+                modelsLoaded = true;
+                startButton.disabled = false;
+                jsonOutputElement.textContent = 'Modèles chargés. Cliquez sur Démarrer.';
+                console.log('Modèles Face-API.js chargés.');
+            } catch (error) {
+                 console.error("Erreur chargement modèles:", error);
+                 jsonOutputElement.textContent = 'Erreur lors du chargement des modèles.';
+            }
+        }
+
+        async function startCameraAndDetection() {
+            if (!modelsLoaded) return;
+            try {
+                // Utilisation de facingMode pour choisir la caméra (user = frontale, environment = arrière)
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "user" } // Changez "user" en "environment" si vous voulez la caméra arrière
+                });
+                videoElement.srcObject = cameraStream;
+                startButton.disabled = true;
+                stopButton.disabled = false;
+
+                // Attendre le chargement et ajuster le canvas
+                videoElement.addEventListener('loadedmetadata', handleVideoLoaded);
+                videoElement.addEventListener('resize', handleVideoResize); // Écouter les changements de taille (orientation)
+
+
+            } catch (err) {
+                console.error("Erreur d'accès caméra:", err);
+                jsonOutputElement.textContent = 'Démarrage caméra annulé ou impossible.';
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            }
+        }
+
+        function stopCameraAndDetection() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+                cameraStream = null;
+
+                startButton.disabled = false;
+                stopButton.disabled = true;
+
+                stopDetectionLoop();
+                clearCanvas();
+                jsonOutputElement.textContent = 'Détection arrêtée.';
+            }
+        }
+
+        function handleVideoLoaded() {
+            console.log("Vidéo chargée. Dimensions:", videoElement.videoWidth, "x", videoElement.videoHeight);
+            // Ajuster la taille du canvas au chargement initial
+            adjustCanvasSize();
+
+            videoElement.removeEventListener('loadedmetadata', handleVideoLoaded);
+
+            startDetectionLoop();
+        }
+
+        function handleVideoResize() {
+             console.log("Vidéo redimensionnée. Nouvelles dimensions:", videoElement.videoWidth, "x", videoElement.videoHeight);
+             // Ajuster la taille du canvas lors du redimensionnement (changement d'orientation)
+             adjustCanvasSize();
+        }
+
+        function adjustCanvasSize() {
+             const displaySize = { width: videoElement.offsetWidth, height: videoElement.offsetHeight };
+             faceapi.matchDimensions(overlayCanvas, displaySize);
+             console.log("Canvas ajusté à:", displaySize.width, "x", displaySize.height);
+        }
+
+
+        function startDetectionLoop() {
+            jsonOutputElement.textContent = "Détection en cours...";
+            const displaySize = { width: videoElement.offsetWidth, height: videoElement.offsetHeight };
+
+
+            detectionIntervalId = setInterval(async () => {
+                 if (!videoElement.paused && !videoElement.ended && videoElement.readyState >= videoElement.HAVE_CURRENT_DATA) {
+                     const detections = await faceapi.detectAllFaces(videoElement, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+
+                     const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+                     clearCanvas();
+                     if (resizedDetections.length > 0) {
+                        faceapi.draw.drawDetections(overlayCanvas, resizedDetections);
+                        faceapi.draw.drawFaceLandmarks(overlayCanvas, resizedDetections);
+
+                        const faceData = formatDetectionsAsJson(resizedDetections); // Utiliser resizedDetections pour les coordonnées JSON
+                        jsonOutputElement.textContent = JSON.stringify(faceData, null, 2);
+                     } else {
+                        jsonOutputElement.textContent = "Aucun visage détecté.";
+                     }
+                 }
+            }, DETECTION_INTERVAL_MS);
+        }
+
+        function stopDetectionLoop() {
+            if (detectionIntervalId !== null) {
+                clearInterval(detectionIntervalId);
+                detectionIntervalId = null;
+            }
+        }
+
+        function clearCanvas() {
+             const context = overlayCanvas.getContext('2d');
+             context.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        }
+
+        function formatDetectionsAsJson(detections) {
+            return detections.map(detection => ({
+                type: "visage_detecte",
+                localisation: {
+                    x: detection.detection.box.x,
+                    y: detection.detection.box.y,
+                    largeur: detection.detection.box.width,
+                    hauteur: detection.detection.box.height
+                },
+                confiance: detection.detection.score,
+                points_cles: detection.landmarks ? detection.landmarks.positions.map(p => ({ x: p.x, y: p.y })) : []
+            }));
+        }
+
+        loadModels();
+
+        startButton.addEventListener('click', startCameraAndDetection);
+        stopButton.addEventListener('click', stopCameraAndDetection);
+
+    </script>
+</body>
+</html>
