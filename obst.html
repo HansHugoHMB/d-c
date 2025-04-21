@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur HTML Chiffré</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            background-color: #0D1C40;
+            color: white;
+            font-family: monospace;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px auto;
+            display: block;
+            width: 70%;
+            border-radius: 8px;
+            border: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            margin-top: 20px;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 14px;
+            background-color: #1e2a60;
+            color: #00ffcc;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h2>Générateur de HTML Chiffré AES</h2>
+
+    <input type="text" id="url_input" placeholder="Entrez l'URL à chiffrer">
+    <button onclick="generateHTML()">Générer le HTML</button>
+
+    <textarea id="html_output" readonly placeholder="Ton fichier HTML chiffré apparaîtra ici..."></textarea>
+
+    <script>
+        async function generateHTML() {
+            const url = document.getElementById("url_input").value;
+            const proxyURL = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
+
+            try {
+                const res = await fetch(proxyURL);
+                const data = await res.json();
+                const htmlContent = data.contents;
+
+                const key = CryptoJS.lib.WordArray.random(16);
+                const iv = CryptoJS.lib.WordArray.random(16);
+
+                const encrypted = CryptoJS.AES.encrypt(htmlContent, key, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+
+                const b64Key = CryptoJS.enc.Base64.stringify(key);
+                const b64IV = CryptoJS.enc.Base64.stringify(iv);
+                const b64Cipher = encrypted.toString();
+
+                const finalHTML = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML CHIFFRÉE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></scr` + `ipt>
+</head>
+<body>
+<script>
+    const encryptedData = "${b64Cipher}";
+    const key = CryptoJS.enc.Base64.parse("${b64Key}");
+    const iv = CryptoJS.enc.Base64.parse("${b64IV}");
+
+    const decrypted = CryptoJS.AES.decrypt(
+        { ciphertext: CryptoJS.enc.Base64.parse(encryptedData) },
+        key,
+        { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+    );
+
+    const decoded = decrypted.toString(CryptoJS.enc.Utf8);
+    document.open();
+    document.write(decoded);
+    document.close();
+</scr` + `ipt>
+</body>
+</html>`;
+
+                document.getElementById("html_output").value = finalHTML;
+
+            } catch (error) {
+                alert("Erreur : " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
