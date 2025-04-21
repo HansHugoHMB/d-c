@@ -2,86 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Générateur HTML Chiffré</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <style>
-        body {
-            background-color: #0D1C40;
-            color: white;
-            font-family: monospace;
-            padding: 40px;
-        }
-
-        h2 {
-            text-align: center;
-        }
-
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            margin: 10px auto;
-            display: block;
-            width: 70%;
-            border-radius: 8px;
-            border: none;
-        }
-
-        textarea {
-            width: 100%;
-            height: 500px;
-            margin-top: 20px;
-            border-radius: 10px;
-            padding: 10px;
-            font-size: 14px;
-            background-color: #1e2a60;
-            color: #00ffcc;
-            border: 1px solid #ccc;
-        }
-    </style>
-</head>
-<body>
-    <h2>Générateur de HTML Chiffré AES</h2>
-
-    <input type="text" id="url_input" placeholder="Entrez l'URL à chiffrer">
-    <button onclick="generateHTML()">Générer le HTML</button>
-
-    <textarea id="html_output" readonly placeholder="Ton fichier HTML chiffré apparaîtra ici..."></textarea>
-
-    <script>
-        async function generateHTML() {
-            const url = document.getElementById("url_input").value;
-            const proxyURL = "https://api.allorigins.win/get?url=" + encodeURIComponent(url);
-
-            try {
-                const res = await fetch(proxyURL);
-                const data = await res.json();
-                const htmlContent = data.contents;
-
-                const key = CryptoJS.lib.WordArray.random(16);
-                const iv = CryptoJS.lib.WordArray.random(16);
-
-                const encrypted = CryptoJS.AES.encrypt(htmlContent, key, {
-                    iv: iv,
-                    mode: CryptoJS.mode.CBC,
-                    padding: CryptoJS.pad.Pkcs7
-                });
-
-                const b64Key = CryptoJS.enc.Base64.stringify(key);
-                const b64IV = CryptoJS.enc.Base64.stringify(iv);
-                const b64Cipher = encrypted.toString();
-
-                const finalHTML = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
     <title>HTML CHIFFRÉE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></scr` + `ipt>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 <script>
-    const encryptedData = "${b64Cipher}";
-    const key = CryptoJS.enc.Base64.parse("${b64Key}");
-    const iv = CryptoJS.enc.Base64.parse("${b64IV}");
+    const encryptedData = "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";
+    const key = CryptoJS.enc.Base64.parse("cRodpF/uGKpcEuoSyU87ng==");
+    const iv = CryptoJS.enc.Base64.parse("OZp616yqAcDcOXzkuWvIlQ==");
 
     const decrypted = CryptoJS.AES.decrypt(
         { ciphertext: CryptoJS.enc.Base64.parse(encryptedData) },
@@ -93,16 +21,6 @@
     document.open();
     document.write(decoded);
     document.close();
-</scr` + `ipt>
-</body>
-</html>`;
-
-                document.getElementById("html_output").value = finalHTML;
-
-            } catch (error) {
-                alert("Erreur : " + error.message);
-            }
-        }
-    </script>
+</script>
 </body>
 </html>
