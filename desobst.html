@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur HTML Chiffré</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0D1C40;
+            --secondary-bg: rgba(30, 42, 96, 0.95);
+            --accent-color: #00ffcc;
+            --hover-color: #00e6b8;
+            --text-color: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.1);
+            --card-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            background-image: url('https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=1600');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-color);
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--secondary-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        .input-group {
+            position: relative;
+            margin: 1.5rem 0;
+            border-radius: 15px;
+            overflow: hidden;
+            background: var(--input-bg);
+            transition: all 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        .eye-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent-color);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .eye-button:hover .eye-icon {
+            opacity: 1;
+        }
+
+        .action-button {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            width: 100%;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.3);
+        }
+
+        .output-container {
+            position: relative;
+            margin-top: 2rem;
+            border-radius: 15px;
+            overflow: hidden;
+            background: var(--input-bg);
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .copy-button:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        .copy-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .copy-button:hover .copy-icon {
+            transform: scale(1.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            background: transparent;
+            color: var(--accent-color);
+            border: none;
+            padding: 1rem;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+        }
+
+        .success-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--primary-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            padding: 20px 40px;
+            color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+            z-index: 1000;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .custom-alert button {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .custom-alert button:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h2>Générateur de HTML Chiffré AES</h2>
+
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    v-model="url" 
+                    placeholder="Entrez l'URL à chiffrer"
+                >
+            </div>
+
+            <div class="input-group">
+                <input 
+                    :type="showPassword ? 'text' : 'password'" 
+                    v-model="password" 
+                    placeholder="Entrez la clé de chiffrement"
+                >
+                <button class="eye-button" @click="togglePassword" type="button">
+                    <svg class="eye-icon" viewBox="0 0 24 24" v-if="!showPassword">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                    <svg class="eye-icon" viewBox="0 0 24 24" v-else>
+                        <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button 
+                class="action-button" 
+                @click="generateHTML"
+                :disabled="isGenerating"
+            >
+                {{ isGenerating ? 'Génération en cours...' : 'Générer le HTML' }}
+            </button>
+
+            <div class="output-container" v-if="output">
+                <button class="copy-button" @click="copyToClipboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="copy-icon" style="width: 16px; height: 16px; fill: var(--primary-bg)">
+                        <path d="M20 2H10c-1.103 0-2 .897-2 2v4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h10c1.103 0 2-.897 2-2v-4h4c1.103 0 2-.897 2-2V4c0-1.103-.897-2-2-2zM4 20V10h10l.002 10H4zm16-6h-4v-4c0-1.103-.897-2-2-2h-4V4h10v10z"/>
+                    </svg>
+                    Copier
+                </button>
+                <textarea v-model="output" readonly></textarea>
+            </div>
+
+            <div class="success-toast" v-if="showCopySuccess">
+                Code copié avec succès !
+            </div>
+
+            <div class="custom-alert" v-if="showAlert">
+                <div>{{ alertMessage }}</div>
+                <button @click="showAlert = false">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    url: '',
+                    password: '',
+                    output: '',
+                    showPassword: false,
+                    showCopySuccess: false,
+                    isGenerating: false,
+                    showAlert: false,
+                    alertMessage: ''
+                }
+            },
+            methods: {
+                showCustomAlert(message) {
+                    this.alertMessage = message;
+                    this.showAlert = true;
+                    setTimeout(() => {
+                        this.showAlert = false;
+                    }, 3000);
+                },
+                togglePassword() {
+                    this.showPassword = !this.showPassword;
+                },
+                copyToClipboard() {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = this.output;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        this.showCopySuccess = true;
+                        setTimeout(() => {
+                            this.showCopySuccess = false;
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Erreur de copie :', err);
+                    } finally {
+                        document.body.removeChild(textArea);
+                    }
+                },
+                async generateHTML() {
+                    if (!this.password || !this.url) {
+                        this.showCustomAlert("Veuillez remplir tous les champs");
+                        return;
+                    }
+
+                    this.isGenerating = true;
+                    const proxyURL = "https://api.allorigins.win/get?url=" + encodeURIComponent(this.url);
+
+                    try {
+                        const res = await fetch(proxyURL);
+                        const data = await res.json();
+                        const htmlContent = data.contents;
+
+                        const key = CryptoJS.PBKDF2(this.password, "salt", {
+                            keySize: 256/32,
+                            iterations: 1000
+                        });
+                        const iv = CryptoJS.lib.WordArray.random(16);
+
+                        const encrypted = CryptoJS.AES.encrypt(htmlContent, key, {
+                            iv: iv,
+                            mode: CryptoJS.mode.CBC,
+                            padding: CryptoJS.pad.Pkcs7
+                        });
+
+                        const b64Key = CryptoJS.enc.Base64.stringify(key);
+                        const b64IV = CryptoJS.enc.Base64.stringify(iv);
+                        const b64Cipher = encrypted.toString();
+
+                        this.output = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML CHIFFRÉE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></scr` + `ipt>
+</head>
+<body>
+<script>
+    const encryptedData = "${b64Cipher}";
+    const key = CryptoJS.enc.Base64.parse("${b64Key}");
+    const iv = CryptoJS.enc.Base64.parse("${b64IV}");
+
+    const decrypted = CryptoJS.AES.decrypt(
+        { ciphertext: CryptoJS.enc.Base64.parse(encryptedData) },
+        key,
+        { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+    );
+
+    const decoded = decrypted.toString(CryptoJS.enc.Utf8);
+    document.open();
+    document.write(decoded);
+    document.close();
+</scr` + `ipt>
+</body>
+</html>`;
+
+                    } catch (error) {
+                        this.showCustomAlert("Erreur lors de la génération du HTML");
+                    } finally {
+                        this.isGenerating = false;
+                    }
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
