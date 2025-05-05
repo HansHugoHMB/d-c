@@ -1,0 +1,31 @@
+name: Minify Commit Message
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  minify-message:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cloner le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Git
+        run: sudo apt-get install git
+
+      - name: Lire le dernier message de commit
+        id: get_message
+        run: |
+          msg=$(git log -1 --pretty=%B)
+          minified=$(echo "$msg" | tr '\n' ' ' | sed -E 's/\s+/ /g' | sed -E 's/ ([.,!?;:])/\1/g' | sed -E 's/^\s+|\s+$//g')
+          echo "message_minifié=$minified" >> $GITHUB_OUTPUT
+
+      - name: Faire un nouveau commit avec message minifié
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit --allow-empty -m "${{ steps.get_message.outputs.message_minifié }}"
+          git push
