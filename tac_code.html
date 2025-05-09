@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Intelligent Replacement</title>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+  <script src="https://cdn.rawgit.com/cozmo/jsQR/master/dist/jsQR.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0D1C40;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .debug-info {
+      font-family: monospace;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .size-control {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    .size-control label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #00c6ff;
+    }
+
+    .size-control input[type="range"] {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .size-value {
+      text-align: center;
+      font-family: monospace;
+      color: #00ff00;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    input[type="text"] {
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      width: 100%;
+    }
+
+    #preview-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    #preview-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #qr-overlay {
+      position: absolute;
+      border: 3px solid #00ff00;
+      box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.3);
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    #status {
+      padding: 1rem;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+
+    .status-success { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
+    .status-error { background: rgba(255, 0, 0, 0.2); color: #ff0000; }
+    .status-info { background: rgba(0, 123, 255, 0.2); color: #007bff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Remplacement Intelligent de QR Code</h2>
+    
+    <div class="status-container">
+      <p>Date UTC : 2025-05-09 07:15:08</p>
+      <p>Utilisateur : HansHugoHMB</p>
+      <div class="debug-info">
+        <div>Mode: <span id="detection-mode">-</span></div>
+        <div>Tentatives: <span id="attempts">0</span></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <input type="file" id="file-input" accept="image/*" style="display: none">
+      <button class="btn" onclick="document.getElementById('file-input').click()">
+        Sélectionner une image
+      </button>
+      <input type="text" id="qr-text" placeholder="Nouveau texte pour le QR code">
+      
+      <div class="size-control">
+        <label for="size-slider">Taille du QR Code (en %)</label>
+        <input type="range" id="size-slider" min="50" max="200" value="100" step="5">
+        <div class="size-value">100%</div>
+      </div>
+
+      <button class="btn" id="process-btn" disabled>Remplacer le QR Code</button>
+    </div>
+
+    <div id="preview-container">
+      <canvas id="preview-canvas"></canvas>
+      <div id="qr-overlay"></div>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    class QRDetector {
+      constructor() {
+        this.codeReader = new ZXing.BrowserQRCodeReader();
+        this.attempts = 0;
+        this.maxAttempts = 3;
+        this.baseQRSize = null;
+        this.centerX = null;
+        this.centerY = null;
+      }
+
+      async detectQRCode(imageElement) {
+        try {
+          const result = await this.codeReader.decodeFromImage(imageElement);
+          if (result) {
+            this.updateDebugInfo('ZXing', ++this.attempts);
+            return this.processZXingResult(result);
+          }
+
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = imageElement.naturalWidth;
+          canvas.height = imageElement.naturalHeight;
+          ctx.drawImage(imageElement, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          
+          if (code) {
+            this.updateDebugInfo('jsQR', ++this.attempts);
+            return this.processJsQRResult(code);
+          }
+
+          throw new Error("Aucun QR code détecté");
+        } catch (error) {
+          console.error('Erreur de détection:', error);
+          throw error;
+        }
+      }
+
+      processZXingResult(result) {
+        const location = result.getResultPoints();
+        const bounds = {
+          x: Math.min(...location.map(p => p.getX())),
+          y: Math.min(...location.map(p => p.getY())),
+          width: Math.max(...location.map(p => p.getX())) - Math.min(...location.map(p => p.getX())),
+          height: Math.max(...location.map(p => p.getY())) - Math.min(...location.map(p => p.getY()))
+        };
+
+        const size = Math.max(bounds.width, bounds.height);
+        this.baseQRSize = size;
+
+        // Calculer et stocker le centre du QR code original
+        this.centerX = bounds.x + (bounds.width / 2);
+        this.centerY = bounds.y + (bounds.height / 2);
+
+        const scaleFactor = document.getElementById('size-slider').value / 100;
+        const newSize = size * scaleFactor;
+
+        return {
+          x: this.centerX - (newSize / 2),
+          y: this.centerY - (newSize / 2),
+          width: newSize,
+          height: newSize,
+          originalSize: size,
+          data: result.getText()
+        };
+      }
+
+      processJsQRResult(result) {
+        const width = result.location.bottomRightCorner.x - result.location.topLeftCorner.x;
+        const height = result.location.bottomRightCorner.y - result.location.topLeftCorner.y;
+        const size = Math.max(width, height);
+        this.baseQRSize = size;
+
+        // Calculer et stocker le centre du QR code original
+        this.centerX = result.location.topLeftCorner.x + (width / 2);
+        this.centerY = result.location.topLeftCorner.y + (height / 2);
+
+        const scaleFactor = document.getElementById('size-slider').value / 100;
+        const newSize = size * scaleFactor;
+
+        return {
+          x: this.centerX - (newSize / 2),
+          y: this.centerY - (newSize / 2),
+          width: newSize,
+          height: newSize,
+          originalSize: size,
+          data: result.data
+        };
+      }
+
+      updateDebugInfo(mode, attempts) {
+        document.getElementById('detection-mode').textContent = mode;
+        document.getElementById('attempts').textContent = attempts;
+      }
+    }
+
+    const detector = new QRDetector();
+    const previewCanvas = document.getElementById('preview-canvas');
+    const ctx = previewCanvas.getContext('2d');
+    let currentImage = null;
+    let qrLocation = null;
+
+    // Gestionnaire pour le slider de taille
+    document.getElementById('size-slider').addEventListener('input', function(e) {
+      document.querySelector('.size-value').textContent = `${e.target.value}%`;
+      if (currentImage && detector.centerX !== null) {
+        updateQROverlay();
+      }
+    });
+
+    function updateQROverlay() {
+      const scaleFactor = document.getElementById('size-slider').value / 100;
+      const newSize = detector.baseQRSize * scaleFactor;
+      
+      const overlay = document.getElementById('qr-overlay');
+      const scale = previewCanvas.offsetWidth / previewCanvas.width;
+      
+      // Calculer la position centrée
+      const newX = detector.centerX - (newSize / 2);
+      const newY = detector.centerY - (newSize / 2);
+
+      overlay.style.left = `${newX * scale}px`;
+      overlay.style.top = `${newY * scale}px`;
+      overlay.style.width = `${newSize * scale}px`;
+      overlay.style.height = `${newSize * scale}px`;
+    }
+
+    document.getElementById('file-input').addEventListener('change', handleFileSelect);
+    document.getElementById('process-btn').addEventListener('click', replaceQRCode);
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          currentImage = img;
+          previewCanvas.width = img.naturalWidth;
+          previewCanvas.height = img.naturalHeight;
+          ctx.drawImage(img, 0, 0);
+          detectAndHighlight();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function detectAndHighlight() {
+      try {
+        updateStatus('Détection du QR code...', 'info');
+        qrLocation = await detector.detectQRCode(currentImage);
+        updateQROverlay();
+        document.getElementById('qr-overlay').style.display = 'block';
+        document.getElementById('process-btn').disabled = false;
+        updateStatus('QR code détecté! Ajustez la taille si nécessaire et cliquez sur Remplacer.', 'success');
+      } catch (error) {
+        updateStatus('Erreur: ' + error.message, 'error');
+      }
+    }
+
+    async function replaceQRCode() {
+      if (!detector.centerX) return;
+
+      try {
+        const newText = document.getElementById('qr-text').value || 'https://example.com';
+        const scaleFactor = document.getElementById('size-slider').value / 100;
+        const newSize = detector.baseQRSize * scaleFactor;
+
+        const qrCode = new QRCodeStyling({
+          width: newSize,
+          height: newSize,
+          type: "canvas",
+          data: newText,
+          margin: 0,
+          dotsOptions: {
+            color: "#007bff",
+            type: "rounded",
+            gradient: {
+              type: "linear",
+              rotation: 0,
+              colorStops: [
+                { offset: 0, color: "#007bff" },
+                { offset: 1, color: "#004a99" }
+              ]
+            }
+          },
+          cornersSquareOptions: {
+            type: "dot",
+            gradient: {
+              type: "linear",
+              rotation: 0,
+              colorStops: [
+                { offset: 0, color: "#007bff" },
+                { offset: 1, color: "#004a99" }
+              ]
+            }
+          },
+          cornersDotOptions: {
+            type: "dot",
+            gradient: {
+              type: "linear",
+              rotation: 0,
+              colorStops: [
+                { offset: 0, color: "#007bff" },
+                { offset: 1, color: "#004a99" }
+              ]
+            }
+          }
+        });
+
+        const qrBlob = await qrCode.getRawData("png");
+        const qrImage = await createImageFromBlob(qrBlob);
+
+        // Calculer la position centrée pour le remplacement
+        const newX = detector.centerX - (newSize / 2);
+        const newY = detector.centerY - (newSize / 2);
+
+        // Nettoyer la zone
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(newX, newY, newSize, newSize);
+
+        // Dessiner le nouveau QR code
+        ctx.drawImage(qrImage, newX, newY, newSize, newSize);
+
+        updateStatus('QR code remplacé avec succès!', 'success');
+        downloadImage();
+      } catch (error) {
+        updateStatus('Erreur lors du remplacement: ' + error.message, 'error');
+      }
+    }
+
+    function createImageFromBlob(blob) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = URL.createObjectURL(blob);
+      });
+    }
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = 'hmb-tech_😈.png';
+      link.href = previewCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function updateStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status-${type}`;
+    }
+  </script>
+</body>
+</html>
