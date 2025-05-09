@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Stylisé en SVG</title>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0D1C40;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-info {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #00c6ff;
+      font-size: 0.9rem;
+    }
+
+    .input-container {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .buttons-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #007bff, #00c6ff);
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    #qr-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    #svg-code {
+      width: 100%;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      padding: 1.5rem;
+      border-radius: 15px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-family: 'Consolas', monospace;
+      font-size: 0.9rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 600px) {
+      .buttons-container {
+        flex-direction: column;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Générateur de QR Code SVG</h2>
+    
+    <div class="user-info">
+      <p>Date UTC : 2025-05-09 06:31:21</p>
+      <p>Utilisateur : HansHugoHMB</p>
+    </div>
+
+    <div class="input-container">
+      <input type="text" id="text" placeholder="Entre ton texte ou lien" />
+      
+      <div class="buttons-container">
+        <button class="btn" onclick="updateQRCode()">Afficher le QR Code</button>
+        <button class="btn" onclick="showSVG()">Afficher le SVG</button>
+        <button class="btn" onclick="downloadQRCode()">Télécharger</button>
+      </div>
+    </div>
+    
+    <div id="qr-container">
+      <div id="qr-code"></div>
+    </div>
+
+    <pre id="svg-code"></pre>
+  </div>
+
+  <script>
+    const qrCode = new QRCodeStyling({
+      width: 300,
+      height: 300,
+      type: "svg",
+      data: "https://example.com",
+      image: "",
+      dotsOptions: {
+        color: "#007bff",
+        type: "rounded",
+        gradient: {
+          type: "linear",
+          rotation: 0,
+          colorStops: [
+            { offset: 0, color: "#007bff" },
+            { offset: 1, color: "#004a99" }
+          ]
+        }
+      },
+      backgroundOptions: {
+        color: "#ffffff",
+      },
+      cornersSquareOptions: {
+        type: "dot",
+        color: "#007bff",
+        gradient: {
+          type: "linear",
+          rotation: 0,
+          colorStops: [
+            { offset: 0, color: "#007bff" },
+            { offset: 1, color: "#004a99" }
+          ]
+        }
+      },
+      cornersDotOptions: {
+        type: "dot",
+        color: "#007bff",
+        gradient: {
+          type: "linear",
+          rotation: 0,
+          colorStops: [
+            { offset: 0, color: "#007bff" },
+            { offset: 1, color: "#004a99" }
+          ]
+        }
+      }
+    });
+
+    window.addEventListener('load', () => {
+      qrCode.append(document.getElementById("qr-code"));
+    });
+
+    function updateQRCode() {
+      const newData = document.getElementById("text").value || "https://example.com";
+      qrCode.update({ data: newData });
+    }
+
+    function showSVG() {
+      const qrNode = document.getElementById("qr-code").querySelector("svg");
+      if (qrNode) {
+        const svgCode = qrNode.outerHTML;
+        document.getElementById("svg-code").textContent = svgCode;
+        document.getElementById("svg-code").scrollIntoView({ 
+          behavior: "smooth",
+          block: "center"
+        });
+      } else {
+        document.getElementById("svg-code").textContent = "QR non généré ou format non-SVG.";
+      }
+    }
+
+    function downloadQRCode() {
+      qrCode.download({
+        name: "qr-code",
+        extension: "svg"
+      });
+    }
+  </script>
+</body>
+</html>
