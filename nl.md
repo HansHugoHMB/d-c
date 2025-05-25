@@ -1,0 +1,15 @@
+|index|Email|Statut|
+|---|---|---|
+|2|May05183200+66799@gay\.email|Jetable/Suspect|
+|11|8137970597@tmomail\.net|Jetable/Suspect|
+|4|sulligus@earthlink\.net|Suspect|
+|9|cdhogan@virginmedia\.com|Suspect|
+|0|emmanuelmbeka0@gmail\.com|Valide|
+|1|hmb-tech@hotmail\.com|Valide|
+|3|bspasiuk@gmail\.com|Valide|
+|5|wendy\.breuer1950@gmail\.com|Valide|
+|6|dbeheler@limestone\.edu|Valide|
+|7|joyce\.chow12@gmail\.com|Valide|
+|8|jgjean106@aol\.com|Valide|
+|10|bpicken@gmail\.com|Valide|
+|12|ommy-k-@hotmail\.com|Valide|
