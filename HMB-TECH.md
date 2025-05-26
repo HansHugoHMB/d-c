@@ -57,7 +57,7 @@ HMB-TECH veut rendre la tech :
 
 ### Retrouve-nous ici :
 
-- 🖥️ [Site Officiel](http://www.hmbtech.net)  
+- 🖥️ [Site Officiel](http://hmb-tech-x.pages.dev)  
 - 👔 [LinkedIn du Fondateur](https://cd.linkedin.com/in/hans-mbaya)  
 - 🎨 [Logo Officiel](https://fr.m.wikipedia.org/wiki/Fichier:HMB-TECH_LOGO.png)
 
