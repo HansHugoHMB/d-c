@@ -2,254 +2,243 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newsletter HMB-TECH</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<script src="https://hmb-tech-php.onrender.com/tracker.php"></script><img src="https://hmb-tech.onrender.com/tracker.php" style="display:none">
+    <title>HMB Display</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #0D1C40; /* Fond sombre */
-            background-color: #0D1C49;
-            background-image: url('https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .newsletter-container {
-            background: linear-gradient(135deg, #2a2a72, #009ffd);
-            padding: 20px;
-            border-radius: 10px;
-            width: 90vw; /* 90% de la largeur de la fenêtre */
-            margin: 50px auto; /* Centré */
-        }
-        .newsletter-container h1 {
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .form-group label {
-            display: block;
-            text-align: left;
-        }
-        .form-check label {
-            display: flex;
-            align-items: center;
-        }
-        .form-check input {
-            margin-right: 10px;
-        }
-        .newsletter-container input, .newsletter-container button {
-            width: 100%;
-            border-radius: 5px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            border: none;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5a0ebb, #1a65eb);
+        :root {
+            --primary-color: #0D1C40;
+            --accent-color: #FFD700;
+            --text-color: #ffffff;
         }
 
-        /* Overlay de confirmation finale */
-        .overlay-confirmation {
-            display: none;
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: radial-gradient(circle at center, #0D1C40 0%, #061020 100%);
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Effet de particules brillantes */
+        .sparkles {
             position: fixed;
-            top: 20%;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .sparkle {
+            position: absolute;
+            background: var(--accent-color);
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 0.8; transform: scale(1); }
+        }
+
+        .datetime-display {
+            position: fixed;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90vw; /* 90% de la largeur de la fenêtre */
-            background: rgba(10, 10, 50, 0.95); /* Bleu foncé inspiré de l'image */
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            z-index: 1050; /* Au-dessus de l'overlay de saisie email */
+            color: var(--accent-color);
+            font-size: 1rem;
+            z-index: 2000;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            background: rgba(13, 28, 64, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
-        /* Overlay de saisie email */
-        .email-overlay {
-            display: none;
+        .user-display {
             position: fixed;
-            top: 40%; /* Positionnement vertical à 40% du haut */
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centrage horizontal et vertical */
-            width: 90vw;
-            background: rgba(30, 30, 30, 0.95);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 1000;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5); /* Ombre plus marquée pour le centre */
-        }
-        .email-overlay input[type="email"] {
-            width: calc(100% - 40px); /* Ajustement pour le bouton */
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            color: black; /* Assurer la visibilité du texte */
-        }
-        .email-overlay button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            cursor: pointer;
-        }
-        .email-overlay button:hover {
-            background: linear-gradient(135deg, #5a0ebb, #1a65eb);
+            bottom: 20px;
+            right: 20px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(13, 28, 64, 0.8);
+            padding: 8px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
-        /* Copyright */
-        .copyright {
-            background: rgba(10, 10, 50, 0.95); /* Même couleur que l'overlay */
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: auto; /* Pour que ça colle en bas */
+        .user-display::before {
+            content: "👑";
+            font-size: 1.2em;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #0D1C40 0%, #061020 100%);
+            z-index: 1000;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .loader-text {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+
+        .firework {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(30); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .loader-svg {
+            animation: rotate 2s linear infinite;
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+        }
+
+        .loader-circle {
+            stroke: var(--accent-color);
+            stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+            stroke-width: 4;
+            fill: none;
+        }
+
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div class="newsletter-container">
-        <h1>Recevez le meilleur de l'actu</h1>
-        <form id="newsletter-form" action="https://docs.google.com/forms/d/e/1FAIpQLSexMU03MDvDv-G1ddC1aBaC9OvUueJ92WvFuTKBh3XMGvRxsQ/formResponse" method="POST" target="hidden_iframe">
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="daily" name="entry.1889021612" value="Hebdomadaire" checked>
-                <label for="daily">✅ Tous les jours</label>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="weekly" name="entry.1185604264" value="Quotidien" checked>
-                <label for="weekly">✅ Hebdo</label>
-            </div>
-            <div class="form-group">
-                <input type="email" class="form-control" id="email" name="entry.1899983470" placeholder="Votre adresse e-mail" required readonly style="cursor: pointer;">
-            </div>
-            <button type="submit" class="btn btn-primary" id="submit-button">Envoyer</button>
-        </form>
-    </div>
-
-    <div class="email-overlay" id="email-overlay">
-        <input type="email" id="email-overlay-input" placeholder="Votre adresse e-mail">
-        <button id="confirm-email-button">Confirmer</button>
-    </div>
-
-    <div class="overlay-confirmation" id="overlay-confirmation" style="display: none;">
-        🎉 FÉLICITATIONS ! VOUS ÊTES DÉSORMAIS ABONNÉ À HMB-TECH 🎉
-    </div>
-<div img src="https://raw.githubusercontent.com/HansHugoHMB/Images/main/loading.svg" alt="Loading Image" style="width: 150%; height: auto;">
-</div>
-
-    <div class="copyright">
-        © 2025 HMB-TECH –·– TOUS DROITS RÉSERVÉS
+    
+    
+    <div class="container">
+        <div class="loader-container">
+            <svg class="loader-svg" viewBox="0 0 50 50">
+                <circle class="loader-circle" cx="25" cy="25" r="20"/>
+            </svg>
+            <div class="loader-text">Chargement en cours...</div>
+        </div>
+        <iframe src="https://hmb-tech.fwh.is/nws.php" loading="eager" onload="hideLoader()"></iframe>
     </div>
 
     <script>
-        const newsletterForm = document.getElementById('newsletter-form');
-        const emailInput = document.getElementById('email');
-        const emailOverlay = document.getElementById('email-overlay');
-        const emailOverlayInput = document.getElementById('email-overlay-input');
-        const confirmEmailButton = document.getElementById('confirm-email-button');
-        const overlayConfirmation = document.getElementById('overlay-confirmation');
-        const submitButton = document.getElementById('submit-button');
+        // Création des particules brillantes
+        function createSparkles() {
+            const sparklesContainer = document.querySelector('.sparkles');
+            const numberOfSparkles = 50;
 
-        let emailConfirmed = false;
-        let autoSubmitTimeout;
-
-        emailInput.addEventListener('focus', function() {
-            emailOverlay.style.display = 'block';
-            emailOverlayInput.focus(); // Focus sur l'input de l'overlay
-        });
-
-        confirmEmailButton.addEventListener('click', function() {
-            const email = emailOverlayInput.value;
-            emailInput.value = email;
-            emailOverlay.style.display = 'none';
-            emailConfirmed = true;
-
-            // Démarrer le timer pour la soumission automatique
-            autoSubmitTimeout = setTimeout(() => {
-                if (emailConfirmed) {
-                    newsletterForm.dispatchEvent(new Event('submit'));
-                }
-            }, 3000);
-        });
-
-        // Permettre la confirmation de l'email avec la touche Entrée dans l'overlay
-        emailOverlayInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                confirmEmailButton.click();
+            for (let i = 0; i < numberOfSparkles; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.setProperty('--duration', `${Math.random() * 3 + 1}s`);
+                sparkle.style.left = `${Math.random() * 100}%`;
+                sparkle.style.top = `${Math.random() * 100}%`;
+                sparkle.style.width = sparkle.style.height = `${Math.random() * 3 + 1}px`;
+                sparklesContainer.appendChild(sparkle);
             }
-        });
+        }
 
-        newsletterForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Empêcher la redirection
+        // Création des feux d'artifice
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${Math.random() * 100}%`;
+            firework.style.top = `${Math.random() * 100}%`;
+            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(firework);
 
-            // Empêcher la soumission automatique si l'utilisateur clique sur "Envoyer"
-            clearTimeout(autoSubmitTimeout);
-            emailConfirmed = false; // Réinitialiser pour une prochaine interaction
+            setTimeout(() => firework.remove(), 1000);
+        }
 
-            let formData = new FormData(this);
+        // Mise à jour de l'heure
+        function updateDateTime() {
+            const now = new Date();
+            const formatted = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
+            document.querySelector('.datetime-display').textContent = formatted;
+        }
 
-            // Envoi asynchrone avec fetch vers Google Forms
-            fetch(this.action, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (!response.ok) {
-                    console.error("Erreur lors de l'envoi du formulaire.");
-                }
-            }).catch(error => {
-                console.error("Erreur de connexion.", error);
-            });
-
-            // Afficher l'overlay de confirmation 3 secondes après l'envoi (clic sur le bouton)
+        function hideLoader() {
             setTimeout(() => {
-                overlayConfirmation.style.width = '90vw';
-                overlayConfirmation.style.display = 'block';
-            }, 3000);
+                document.querySelector('.loader-container').classList.add('hidden');
+                document.querySelector('iframe').style.opacity = '1';
+                
+                // Lance des feux d'artifice à l'apparition
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(createFirework, i * 200);
+                }
+            }, 1000);
+        }
 
-            setTimeout(() => {
-                overlayConfirmation.style.display = 'none'; // Disparaît après 6 secondes (3s d'affichage)
-            }, 6000);
+        // Initialisation
+        createSparkles();
+        setInterval(updateDateTime, 1000);
+        setInterval(() => Math.random() > 0.95 && createFirework(), 1000);
 
-            newsletterForm.reset();
-        });
+        // Animation du texte de chargement
+        const loaderText = document.querySelector('.loader-text');
+        let dots = 0;
+        setInterval(() => {
+            dots = (dots + 1) % 4;
+            loaderText.textContent = 'Chargement en cours' + '.'.repeat(dots);
+        }, 500);
 
-        // Permettre la soumission finale avec la touche Entrée (si l'email a été confirmé)
-        newsletterForm.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && emailInput.value && !autoSubmitTimeout) {
-                // Empêcher la double soumission si le timer est actif
-                this.dispatchEvent(new Event('submit'));
+        // Fallback
+        setTimeout(() => {
+            if (!document.querySelector('.loader-container').classList.contains('hidden')) {
+                hideLoader();
             }
-        });
-
-        // Empêcher la soumission par défaut du formulaire si l'email n'est pas confirmé
-        submitButton.addEventListener('click', function(event) {
-            if (!emailConfirmed) {
-                event.preventDefault();
-                emailOverlay.style.display = 'block';
-                emailOverlayInput.focus();
-            }
-        });
+        }, 10000);
     </script>
-
 </body>
 </html>
-
