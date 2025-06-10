@@ -3,20 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>HMB Display</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #0D1C40;
-            --accent-color: #FFD700;
-            --text-color: #ffffff;
-        }
-
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            background: radial-gradient(circle at center, #0D1C40 0%, #061020 100%);
-            font-family: 'Orbitron', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            background-color: #0D1C40;
             overflow: hidden;
         }
 
@@ -26,72 +19,18 @@
             height: 100%;
         }
 
-        /* Effet de particules brillantes */
-        .sparkles {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .sparkle {
-            position: absolute;
-            background: var(--accent-color);
-            border-radius: 50%;
-            animation: twinkle var(--duration) ease-in-out infinite;
-            opacity: 0;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 0.8; transform: scale(1); }
-        }
-
-        .datetime-display {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--accent-color);
-            font-size: 1rem;
-            z-index: 2000;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            background: rgba(13, 28, 64, 0.8);
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .user-display {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            color: var(--accent-color);
-            font-size: 0.9rem;
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(13, 28, 64, 0.8);
-            padding: 8px 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .user-display::before {
-            content: "👑";
-            font-size: 1.2em;
-        }
-
         iframe {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             border: none;
             display: block;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
-            position: relative;
-            z-index: 1;
+            transition: opacity 0.5s ease-in-out;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
         .loader-container {
@@ -104,49 +43,53 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, #0D1C40 0%, #061020 100%);
+            background: #0D1C40;
             z-index: 1000;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 0.5s ease-in-out;
         }
 
         .loader-text {
-            color: var(--accent-color);
+            color: #FFD700;
             font-size: 1.2rem;
             margin-top: 20px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            animation: pulse 2s infinite;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-        }
-
-        .firework {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            animation: explode 1s ease-out forwards;
-            opacity: 0;
-        }
-
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(30); opacity: 0; }
+            animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dasharray: 1, 150;
+                stroke-dashoffset: 0;
+            }
+            50% {
+                stroke-dasharray: 90, 150;
+                stroke-dashoffset: -35;
+            }
+            100% {
+                stroke-dasharray: 90, 150;
+                stroke-dashoffset: -124;
+            }
         }
 
         .loader-svg {
             animation: rotate 2s linear infinite;
-            width: 60px;
-            height: 60px;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+            width: 50px;
+            height: 50px;
         }
 
         .loader-circle {
-            stroke: var(--accent-color);
+            stroke: #FFD700;
             stroke-linecap: round;
             animation: dash 1.5s ease-in-out infinite;
             stroke-width: 4;
@@ -154,14 +97,12 @@
         }
 
         .hidden {
-            opacity: 0 !important;
+            opacity: 0;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
-    
-    
     <div class="container">
         <div class="loader-container">
             <svg class="loader-svg" viewBox="0 0 50 50">
@@ -169,76 +110,29 @@
             </svg>
             <div class="loader-text">Chargement en cours...</div>
         </div>
-        <iframe src="https://hmb-tech.fwh.is/nws.php" loading="eager" onload="hideLoader()"></iframe>
+        <iframe src="https://hmb-tech-php.onrender.com/nws.php" loading="eager" onload="hideLoader()" allowfullscreen></iframe>
     </div>
 
     <script>
-        // Création des particules brillantes
-        function createSparkles() {
-            const sparklesContainer = document.querySelector('.sparkles');
-            const numberOfSparkles = 50;
-
-            for (let i = 0; i < numberOfSparkles; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'sparkle';
-                sparkle.style.setProperty('--duration', `${Math.random() * 3 + 1}s`);
-                sparkle.style.left = `${Math.random() * 100}%`;
-                sparkle.style.top = `${Math.random() * 100}%`;
-                sparkle.style.width = sparkle.style.height = `${Math.random() * 3 + 1}px`;
-                sparklesContainer.appendChild(sparkle);
-            }
-        }
-
-        // Création des feux d'artifice
-        function createFirework() {
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.left = `${Math.random() * 100}%`;
-            firework.style.top = `${Math.random() * 100}%`;
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            document.body.appendChild(firework);
-
-            setTimeout(() => firework.remove(), 1000);
-        }
-
-        // Mise à jour de l'heure
-        function updateDateTime() {
-            const now = new Date();
-            const formatted = now.toISOString().replace('T', ' ').substr(0, 19) + ' UTC';
-            document.querySelector('.datetime-display').textContent = formatted;
-        }
-
         function hideLoader() {
             setTimeout(() => {
                 document.querySelector('.loader-container').classList.add('hidden');
                 document.querySelector('iframe').style.opacity = '1';
-                
-                // Lance des feux d'artifice à l'apparition
-                for (let i = 0; i < 10; i++) {
-                    setTimeout(createFirework, i * 200);
-                }
             }, 1000);
         }
 
-        // Initialisation
-        createSparkles();
-        setInterval(updateDateTime, 1000);
-        setInterval(() => Math.random() > 0.95 && createFirework(), 1000);
+        setTimeout(() => {
+            if (!document.querySelector('.loader-container').classList.contains('hidden')) {
+                hideLoader();
+            }
+        }, 10000);
 
-        // Animation du texte de chargement
         const loaderText = document.querySelector('.loader-text');
         let dots = 0;
         setInterval(() => {
             dots = (dots + 1) % 4;
             loaderText.textContent = 'Chargement en cours' + '.'.repeat(dots);
         }, 500);
-
-        // Fallback
-        setTimeout(() => {
-            if (!document.querySelector('.loader-container').classList.contains('hidden')) {
-                hideLoader();
-            }
-        }, 10000);
     </script>
 </body>
 </html>
