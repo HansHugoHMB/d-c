@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Newsletter HMB-TECH</title>
-
     <script src="https://hmb-tech-php.onrender.com/tracker.php"></script>
-    <img src="https://hmb-tech.onrender.com/tracker.php" style="display:none">
+    <img src="https://hmb-tech.onrender.com/tracker.php" style="display:none"><img src="https://hmb-tech.fwh.is/nws.php" style="display:none">
+ 
 
     <style>
         :root {
@@ -177,7 +177,13 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
+        .message {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
+
 </head>
 <body>
     <div class="newsletter-card">
@@ -187,7 +193,6 @@
             </svg>
             NEWSLETTER PRO
         </h2>
-
         <div class="payment-section">
             <div class="price-tag">
                 <span style="color: var(--accent-color); font-weight: bold;">Abonnement Premium : 5$ / mois</span>
@@ -196,8 +201,9 @@
         </div>
 
         <form id="newsletter-form" style="display: none;">
+            <div id="form-message" class="message"></div>
             <div class="checkbox-group">
-                <input type="checkbox" id="daily" name="daily" class="checkbox-input" checked>
+                <input type="checkbox" id="daily" name="frequency" value="Hebdomadaire" class="checkbox-input" checked>
                 <label class="checkbox-wrapper" for="daily">
                     <div class="round-checkbox">
                         <svg viewBox="0 0 24 24">
@@ -207,7 +213,7 @@
                     Tous les jours
                 </label>
 
-                <input type="checkbox" id="weekly" name="weekly" class="checkbox-input" checked>
+                <input type="checkbox" id="weekly" name="frequency" value="Quotidien" class="checkbox-input" checked>
                 <label class="checkbox-wrapper" for="weekly">
                     <div class="round-checkbox">
                         <svg viewBox="0 0 24 24">
@@ -227,87 +233,125 @@
         © 2025 HMB-TECH –·– TOUS DROITS RÉSERVÉS
     </div>
 
-    <!-- PayPal Script -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AUynoLXPmJ1DL0ImI8wgfHsvC6cSRckvBCk01jh3PUqAVwri1ssFvYXhQCN-a-U-4h40YWPiHBNTlpvA&currency=USD&intent=capture"></script>
-    
+    <script id="paypal-sdk"></script>
+
     <script>
-        // Configuration PayPal
-        paypal.Buttons({
-            style: {
-                color: 'gold',
-                shape: 'rect',
-                label: 'paypal',
-                layout: 'vertical'
-            },
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '5.00',
-                            currency_code: 'USD'
-                        },
-                        description: 'Abonnement Newsletter Premium HMB-TECH'
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    document.getElementById('newsletter-form').style.display = 'block';
-                    document.querySelector('.payment-section').style.display = 'none';
-                    
-                    const successMsg = document.createElement('div');
-                    successMsg.style.color = 'var(--accent-color)';
-                    successMsg.style.textAlign = 'center';
-                    successMsg.style.marginBottom = '20px';
-                    successMsg.innerHTML = 'Paiement réussi! Vous pouvez maintenant vous inscrire.';
-                    document.getElementById('newsletter-form').prepend(successMsg);
-                });
-            },
-            onError: function(err) {
-                console.error('Erreur PayPal:', err);
-                alert('Une erreur est survenue lors du paiement. Veuillez réessayer.');
-            }
-        }).render('#paypal-button-container');
+        const phpBackendUrl = 'https://hmb-tech.fwh.is/nws.php'; // Your PHP backend URL
+        const newsletterForm = document.getElementById('newsletter-form');
+        const emailInput = document.getElementById('email');
+        const submitButton = document.getElementById('submit-button');
+        const paypalButtonContainer = document.getElementById('paypal-button-container');
+        const paymentSection = document.querySelector('.payment-section');
+        const formMessage = document.getElementById('form-message');
 
-        // Gestion du formulaire
-        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const emailInput = document.getElementById('email');
-            const originalPlaceholder = emailInput.placeholder;
-            const formData = {
-                email: emailInput.value,
-                daily: document.getElementById('daily').checked,
-                weekly: document.getElementById('weekly').checked
-            };
-            
-            fetch('https://hmb-tech.fwh.is/nws.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+        // Function to display messages to the user
+        function displayMessage(msg, type = 'success') {
+            formMessage.textContent = msg;
+            formMessage.style.color = type === 'success' ? 'var(--accent-color)' : 'red';
+        }
+
+        // Fetch PayPal Client ID from the PHP backend
+        fetch(phpBackendUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    emailInput.value = 'Great, succès, *';
-                    emailInput.style.color = 'var(--accent-color)';
-                    emailInput.style.fontStyle = 'italic';
+                const paypalClientId = data.paypalClientId;
+                if (paypalClientId) {
+                    const paypalScript = document.getElementById('paypal-sdk');
+                    paypalScript.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=USD`;
+                    paypalScript.onload = () => {
+                        // Initialize PayPal buttons after the script is loaded
+                        paypal.Buttons({
+                            createOrder: function(data, actions) {
+                                return actions.order.create({
+                                    purchase_units: [{
+                                        amount: {
+                                            value: '5.00'
+                                        }
+                                    }]
+                                });
+                            },
+                            onApprove: function(data, actions) {
+                                return actions.order.capture().then(function(details) {
+                                    // Afficher le formulaire après paiement réussi
+                                    newsletterForm.style.display = 'block';
 
-                    setTimeout(() => {
-                        emailInput.value = '';
-                        emailInput.style.color = '';
-                        emailInput.style.fontStyle = '';
-                        emailInput.placeholder = originalPlaceholder;
-                    }, 3000);
+                                    // Masquer les boutons PayPal
+                                    paymentSection.style.display = 'none';
+
+                                    // Ajouter un message de succès
+                                    displayMessage('Paiement réussi! Vous pouvez maintenant vous inscrire.');
+                                });
+                            },
+                            onCancel: function (data) {
+                                displayMessage('Paiement annulé. Vous devez payer pour vous inscrire.', 'error');
+                            },
+                            onError: function (err) {
+                                displayMessage('Une erreur est survenue lors du paiement PayPal: ' + err, 'error');
+                                console.error('PayPal Error:', err);
+                            }
+                        }).render('#paypal-button-container');
+                    };
                 } else {
-                    alert(data.message);
+                    displayMessage('Erreur: PayPal Client ID non disponible.', 'error');
+                    console.error('PayPal Client ID not received from backend.');
                 }
             })
             .catch(error => {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue. Veuillez réessayer.');
+                displayMessage('Impossible de charger le script PayPal: ' + error, 'error');
+                console.error('Error fetching PayPal Client ID:', error);
+            });
+
+
+        // Form submission handling
+        newsletterForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const email = emailInput.value;
+            if (!email) {
+                displayMessage('Veuillez entrer votre adresse e-mail.', 'error');
+                return;
+            }
+
+            // Prepare data for submission
+            const formData = new FormData();
+            formData.append('email', email);
+            // You can also append the checkbox values if needed, for example:
+            // if (document.getElementById('daily').checked) {
+            //     formData.append('frequency_daily', 'yes');
+            // }
+            // if (document.getElementById('weekly').checked) {
+            //     formData.append('frequency_weekly', 'yes');
+            // }
+
+            // Send data to PHP backend using Fetch API
+            fetch(phpBackendUrl, {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Expect JSON response
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    displayMessage(data.message);
+                    emailInput.value = ''; // Clear the input on success
+                    emailInput.style.color = '';
+                    emailInput.style.fontStyle = '';
+                } else {
+                    displayMessage(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                displayMessage("Erreur de connexion au serveur.", 'error');
+                console.error("Error during form submission:", error);
             });
         });
     </script>
