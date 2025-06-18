@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>HMB Display</title>
+    <meta name="referrer" content="no-referrer">
+    <title>NEWSLETTER PRO</title>
     <style>
         html, body {
             margin: 0;
@@ -110,22 +111,53 @@
             </svg>
             <div class="loader-text">Chargement en cours...</div>
         </div>
-        <iframe src="https://hmb-tech.fwh.is/nws.php" loading="eager" onload="hideLoader()" allowfullscreen></iframe>
+        <iframe 
+            src="https://hmb-tech.fwh.is/nws.php" 
+            loading="eager" 
+            onload="hideLoader()" 
+            allowfullscreen
+            referrerpolicy="no-referrer"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            importance="high"
+            fetchpriority="high"
+            allow="fullscreen"
+        ></iframe>
     </div>
 
     <script>
+        // Ajout d'une vérification de chargement alternative
+        let isLoaded = false;
+
         function hideLoader() {
-            setTimeout(() => {
-                document.querySelector('.loader-container').classList.add('hidden');
-                document.querySelector('iframe').style.opacity = '1';
-            }, 1000);
+            if (!isLoaded) {
+                isLoaded = true;
+                setTimeout(() => {
+                    document.querySelector('.loader-container').classList.add('hidden');
+                    document.querySelector('iframe').style.opacity = '1';
+                }, 500);
+            }
         }
 
-        setTimeout(() => {
-            if (!document.querySelector('.loader-container').classList.contains('hidden')) {
-                hideLoader();
+        // Vérifie l'état de chargement toutes les 500ms
+        const checkInterval = setInterval(() => {
+            const iframe = document.querySelector('iframe');
+            try {
+                if (iframe.contentWindow || iframe.contentDocument) {
+                    hideLoader();
+                    clearInterval(checkInterval);
+                }
+            } catch (e) {
+                // En cas d'erreur CORS, on affiche quand même après 1 seconde
+                setTimeout(hideLoader, 1000);
+                clearInterval(checkInterval);
             }
-        }, 10000);
+        }, 500);
+
+        // Fallback après 3 secondes maximum
+        setTimeout(() => {
+            hideLoader();
+            clearInterval(checkInterval);
+        }, 3000);
 
         const loaderText = document.querySelector('.loader-text');
         let dots = 0;
