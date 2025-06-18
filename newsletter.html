@@ -197,7 +197,7 @@
 
         <form id="newsletter-form" style="display: none;">
             <div class="checkbox-group">
-                <input type="checkbox" id="daily" name="daily" value="Hebdomadaire" class="checkbox-input" checked>
+                <input type="checkbox" id="daily" name="daily" class="checkbox-input" checked>
                 <label class="checkbox-wrapper" for="daily">
                     <div class="round-checkbox">
                         <svg viewBox="0 0 24 24">
@@ -207,7 +207,7 @@
                     Tous les jours
                 </label>
 
-                <input type="checkbox" id="weekly" name="weekly" value="Quotidien" class="checkbox-input" checked>
+                <input type="checkbox" id="weekly" name="weekly" class="checkbox-input" checked>
                 <label class="checkbox-wrapper" for="weekly">
                     <div class="round-checkbox">
                         <svg viewBox="0 0 24 24">
@@ -227,42 +227,47 @@
         © 2025 HMB-TECH –·– TOUS DROITS RÉSERVÉS
     </div>
 
+    <!-- PayPal Script -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AUynoLXPmJ1DL0ImI8wgfHsvC6cSRckvBCk01jh3PUqAVwri1ssFvYXhQCN-a-U-4h40YWPiHBNTlpvA&currency=USD&intent=capture"></script>
+    
     <script>
-        // Récupérer la clé PayPal et initialiser le bouton
-        fetch('https://hmb-tech.fwh.is/nws.php')
-            .then(response => response.json())
-            .then(data => {
-                const script = document.createElement('script');
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                document.body.appendChild(script);
-
-                script.onload = () => {
-                    paypal.Buttons({
-                        createOrder: function(data, actions) {
-                            return actions.order.create({
-                                purchase_units: [{
-                                    amount: {
-                                        value: '5.00'
-                                    }
-                                }]
-                            });
+        // Configuration PayPal
+        paypal.Buttons({
+            style: {
+                color: 'gold',
+                shape: 'rect',
+                label: 'paypal',
+                layout: 'vertical'
+            },
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '5.00',
+                            currency_code: 'USD'
                         },
-                        onApprove: function(data, actions) {
-                            return actions.order.capture().then(function(details) {
-                                document.getElementById('newsletter-form').style.display = 'block';
-                                document.querySelector('.payment-section').style.display = 'none';
-                                
-                                const successMsg = document.createElement('div');
-                                successMsg.style.color = 'var(--accent-color)';
-                                successMsg.style.textAlign = 'center';
-                                successMsg.style.marginBottom = '20px';
-                                successMsg.innerHTML = 'Paiement réussi! Vous pouvez maintenant vous inscrire.';
-                                document.getElementById('newsletter-form').prepend(successMsg);
-                            });
-                        }
-                    }).render('#paypal-button-container');
-                };
-            });
+                        description: 'Abonnement Newsletter Premium HMB-TECH'
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    document.getElementById('newsletter-form').style.display = 'block';
+                    document.querySelector('.payment-section').style.display = 'none';
+                    
+                    const successMsg = document.createElement('div');
+                    successMsg.style.color = 'var(--accent-color)';
+                    successMsg.style.textAlign = 'center';
+                    successMsg.style.marginBottom = '20px';
+                    successMsg.innerHTML = 'Paiement réussi! Vous pouvez maintenant vous inscrire.';
+                    document.getElementById('newsletter-form').prepend(successMsg);
+                });
+            },
+            onError: function(err) {
+                console.error('Erreur PayPal:', err);
+                alert('Une erreur est survenue lors du paiement. Veuillez réessayer.');
+            }
+        }).render('#paypal-button-container');
 
         // Gestion du formulaire
         document.getElementById('newsletter-form').addEventListener('submit', function(e) {
